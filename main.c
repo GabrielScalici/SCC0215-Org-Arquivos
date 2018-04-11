@@ -23,5 +23,10 @@ void menu()
 
 int main(int argc, char *argv[]){
 
+  FILE *f;
+
+  // Criando o arquivo de registros com base no csv
+  f = cria_arquivo();
+
   return 0;
 }

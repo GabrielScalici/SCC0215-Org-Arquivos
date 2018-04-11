@@ -1,7 +1,9 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
 
-//Definicao do registro
+/*
+ *  ESTRUTURAS
+ */
 typedef struct{
     int codINEP;
     char dataAtiv[10];
@@ -10,5 +12,10 @@ typedef struct{
     char* municipio;
     char* prestadora;
 } Registro;
+
+/*
+ *  FUNCOES
+ */
+FILE* cria_arquivo();
 
 #endif
