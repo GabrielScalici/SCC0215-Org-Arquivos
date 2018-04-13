@@ -65,7 +65,7 @@ void recuperar_registros(FILE *f){
           break; //Nao precisa fechar o arquivo pois esta fechando quando sair do loop
         }
         //Caso nao tenha dado errros, entao exibe para o usuario
-        printf("%d %s %s %d %s %d %s %d %s\n", saida.codINEP, saida.dataAtiv, saida.uf, sizeof(saida.nomEscola), saida.nomEscola, sizeof(saida.municipio), saida.municipio, sizeof(saida.prestadora), saida.prestadora);
+        printf("%d %s %s %d %s %d %s %d %s\n", saida.codINEP, saida.dataAtiv, saida.uf, strlen(saida.nomEscola), saida.nomEscola, strlen(saida.municipio), saida.municipio, strlen(saida.prestadora), saida.prestadora);
 
         //Atualizando para mostrar outros registros
         i++;
