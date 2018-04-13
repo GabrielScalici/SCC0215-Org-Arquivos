@@ -28,5 +28,7 @@ int main(int argc, char *argv[]){
   // Criando o arquivo de registros com base no csv
   f = cria_arquivo();
 
+  //recuperar_registros(f);
+
   return 0;
 }

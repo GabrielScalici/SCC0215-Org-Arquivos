@@ -17,5 +17,6 @@ typedef struct{
  *  FUNCOES
  */
 FILE* cria_arquivo();
+void recuperar_registros(FILE *f);
 
 #endif
