@@ -4,6 +4,13 @@
 /*
  *  ESTRUTURAS
  */
+ //Definindo o cabecalho
+ typedef struct{
+      char status;
+      int topoPilha;
+ } Cabecalho;
+
+//Definindo os registros
 typedef struct{
     int codINEP;
     char dataAtiv[10];
