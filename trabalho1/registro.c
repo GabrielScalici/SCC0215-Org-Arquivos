@@ -1,3 +1,13 @@
+/*
+ *  TRABALHO DE ORGANIZAÇÃO DE ARQUIVOS
+ *
+ *  NOMES:                    NUMERO USP
+ *  GABRIEL SCALICI           9292970
+ *
+ *
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +18,10 @@
 /*
     DISPOSICAO DOS CAMPOS NO ARQUIVO
     PRESTADORA, DATA, CODIGO, NOME_ESCOLA, MUNICIPIO ,UF
+
+    DISPOSICAO QUE DEVE SER EXIBIDA AO USUARIO
+    CODIGO, DATA, UF, (TAMANHO_NOME_ESCOLA), ESCOLA, (TAMANHO MUNICIPIO), MUNICIPIO, (TAMANHO PRESTADORA), PRESTADORA
+
 
     REGISTRO REMOVIDO: USAR SEEK_CUR
     RECUPERAR TODOS OS DADOS SEEK_SET
@@ -26,6 +40,11 @@ FILE* cria_arquivo(){
     //Verificando se foi aberto corretamente
     verifica_arquivo(f);
 
+    //Setar -1 no topo da pilha do cabecalho pois indica que nao teve remocao ainda
+    int RRN_Rem = -1;
+    //Setar 0 no status (Atualizar para 1 somente quando tudo tiver dado sucesso)
+    int status = 0;
+
     printf("Arquivo carregado.\n");
     fclose(f);
     return f;
@@ -41,7 +60,6 @@ void verifica_arquivo(FILE *f){
 
 //funcao para ler todos os registros
 void recuperar_dados(FILE *f){
-  x
 
 
 
