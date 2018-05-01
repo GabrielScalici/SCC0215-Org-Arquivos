@@ -1,9 +1,9 @@
 /*
  *  TRABALHO DE ORGANIZAÇÃO DE ARQUIVOS
  *
- *  NOMES:                    NUMERO USP
- *  GABRIEL SCALICI           9292970
- *
+ *  NOMES:                      NUMERO USP
+ *  GABRIEL SCALICI             9292970
+ *  RODRIGO NOVENTA JR          9791243
  *
  *
  */
@@ -22,10 +22,8 @@
     DISPOSICAO QUE DEVE SER EXIBIDA AO USUARIO
     CODIGO, DATA, UF, (TAMANHO_NOME_ESCOLA), ESCOLA, (TAMANHO MUNICIPIO), MUNICIPIO, (TAMANHO PRESTADORA), PRESTADORA
 
-
     REGISTRO REMOVIDO: USAR SEEK_CUR
     RECUPERAR TODOS OS DADOS SEEK_SET
-
 */
 
 
@@ -33,20 +31,14 @@
  *	Criar arquivo (caso não exista) e inserir o RRN do ultimo
  *  registro removido (PILHA).
 */
-FILE* cria_arquivo(){
-    // Leitura do arquivo
-    FILE *f = fopen("turmaB-dadosPBLE.csv", "rb");
+FILE* cria_arquivo(char *arquivo){
+    FILE *f;
+    
+    f = fopen(arquivo, "rb");       //Abre o arquivo em modo de leitura binária
+    verifica_arquivo(f);            //Verifica se o arquivo abriu corretamente
 
-    //Verificando se foi aberto corretamente
-    verifica_arquivo(f);
+    printf("Arquivo carregado.\n"); 
 
-    //Setar -1 no topo da pilha do cabecalho pois indica que nao teve remocao ainda
-    int RRN_Rem = -1;
-    //Setar 0 no status (Atualizar para 1 somente quando tudo tiver dado sucesso)
-    int status = 0;
-
-    printf("Arquivo carregado.\n");
-    fclose(f);
     return f;
 }
 

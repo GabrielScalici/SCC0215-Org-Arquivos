@@ -1,6 +1,9 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
 
+//Definindo o tamanho do registro
+#define TAM_REG 87
+
 /*
  *  ESTRUTURAS
  */
