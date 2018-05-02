@@ -25,6 +25,7 @@ int main(int argc, char *argv[]){
   switch(opt){
     case(LEITURA):{
       int tam;    //Tamanho do arquivo
+      int i;
 
       f = cria_arquivo(argv[2]);  //argv[2] = nome do arquivo
       cab.status = '0';
@@ -37,6 +38,20 @@ int main(int argc, char *argv[]){
       //Como os registros são de tamanho fixo, é possível calcular a quantidade de registros
       qtdRegs = tam/TAM_REG;
 
+      //Aloca a quantidade de memória necessária
+      reg = (Registro *) calloc(qtdRegs, sizeof(Registro));
+
+      //Armazena na memória
+      for(i = 0;i < qtdRegs;i++){
+        //todo
+      }
+
+      fclose(f);  //Tira o arquivo da memória
+
+      break;
+    }
+    case(RECUPERA):{
+      //todo
       break;
     }
   
