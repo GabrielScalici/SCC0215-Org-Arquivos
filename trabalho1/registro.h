@@ -31,6 +31,6 @@ typedef struct{
  */
 FILE* cria_arquivo();
 void verifica_arquivo(FILE *f);
-void recuperar_registros(FILE *f);
+Registro *recuperar_registros(FILE *f);
 
 #endif

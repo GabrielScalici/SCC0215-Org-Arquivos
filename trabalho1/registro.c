@@ -51,8 +51,29 @@ void verifica_arquivo(FILE *f){
 }
 
 //funcao para ler todos os registros
-void recuperar_dados(FILE *f){
+Registro *recuperar_dados(FILE *f){
+    int tam;
+    int qtdRegs;
+    int i;
+    Registro *reg;
 
+    //Descobre tamanho do arquivo e volta para o início do mesmo
+    fseek(f, 0, SEEK_END);
+    tam = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
+    //Como os registros são de tamanho fixo, é possível calcular a quantidade de registros
+    qtdRegs = tam/TAM_REG;
 
+    //Aloca a quantidade de memória necessária
+    reg = (Registro *) calloc(qtdRegs, sizeof(Registro));
+
+    //Armazena na memória
+    for(i = 0;i < qtdRegs;i++){
+    //todo
+    }
+
+    fclose(f);  //Tira o arquivo da memória
+
+    return reg;
 }
