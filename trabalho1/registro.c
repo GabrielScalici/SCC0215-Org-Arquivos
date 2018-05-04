@@ -54,7 +54,8 @@ void verifica_arquivo(FILE *f){
 Registro *recuperar_dados(FILE *f){
     int tam;
     int qtdRegs;
-    int i;
+    int i, j;
+    char c;
     Registro *reg;
 
     //Descobre tamanho do arquivo e volta para o início do mesmo
@@ -70,7 +71,8 @@ Registro *recuperar_dados(FILE *f){
 
     //Armazena na memória
     for(i = 0;i < qtdRegs;i++){
-    //todo
+        fscanf(f, "%d", reg[i].codINEP);
+        //todo
     }
 
     fclose(f);  //Tira o arquivo da memória

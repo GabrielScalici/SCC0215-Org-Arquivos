@@ -3,6 +3,8 @@
 
 //Definindo o tamanho do registro
 #define TAM_REG 87
+//Definindo o delimitador de campo
+#define DEL_CAMPO 59
 
 /*
  *  ESTRUTURAS
