@@ -49,28 +49,18 @@ void verifica_arquivo(FILE *f){
     }
 }
 
-//funcao para ler todos os registros
-Registro *recuperar_registros(FILE *f){
+//funcao para ler todos os registros e alocar na RAM
+Registro *recuperar_registros(FILE *f, int qtdRegs){
     int tam;
-    int qtdRegs;
     int alternando = 0, qtd = 0, i=0;
     char c;
     Registro *reg;
 
-    //Descobre tamanho do arquivo e volta para o início do mesmo
-    fseek(f, 0, SEEK_END);
-    tam = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    //Como os registros são de tamanho fixo, é possível calcular a quantidade de registros
-    qtdRegs = tam/TAM_REG;
-
     //Aloca a quantidade de memória necessária
     reg = (Registro *) calloc(qtdRegs, sizeof(Registro));
-
-    char* carac= (char*)calloc(80, sizeof(char));
+    
     while(1){
-
+        char* carac= (char*)calloc(80, sizeof(char));
         do{
             c= fgetc(f);
             if(c != ';' && c != '\n' && c != EOF){
@@ -80,6 +70,7 @@ Registro *recuperar_registros(FILE *f){
         } while (c != ';' && c != '\n' && c != EOF );
         carac[i] = '\0';
 
+        if(i > 0){    //caso o campo nao esteja preenchido
             if(alternando == 0){//colocando no campos campos prestadora e tam_prestadora
                 reg[qtd].prestadora = carac;
                 reg[qtd].tam_prestadora = i;
@@ -87,13 +78,12 @@ Registro *recuperar_registros(FILE *f){
                 alternando=1;
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
-                //reg[qtd].dataAtiv = carac;
-                printf("Data:%s\n", carac);
+                strcpy(reg[qtd].dataAtiv, carac);
+                printf("Data:%s\n", reg[qtd].dataAtiv);
                 alternando=2;
             }
             else if(alternando == 2){//colocando no campo de codINEP
                 reg[qtd].codINEP = atoi(carac);
-                //reg[qtd].codINEP = carac;
                 printf("codINEP:%d\n", reg[qtd].codINEP);
                 alternando=3;
             }
@@ -110,22 +100,51 @@ Registro *recuperar_registros(FILE *f){
                 alternando=5;
             }
             else if(alternando == 5){//colocando no campo de uf
-                //reg[qtd].uf = carac;
-                printf("UF:%s\n", carac);
+                strcpy(reg[qtd].uf, carac);
+                printf("UF:%s\n", reg[qtd].uf);
                 qtd++;
                 alternando=0;
-            }           
+            }
+        }  
+        else alternando++;  //se houver um campo sem informacao pula para o proximo campo
+
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
-            char* carac= (char*)calloc(80, sizeof(char));
             i = 0;
             printf("-----------------------\n");
         
-        if(c == EOF) break;
+        if(feof(f)) break; //ou c == EOF (?)
     }
-    free(carac);
 
     fclose(f);  //Tira o arquivo da memória
 
     return reg;
+}
+
+//funcao pra tranferir os registros para o arquivo de saida ja com o cabecalho
+void transfere_arquivo(Registro* reg, int qtdRegs){
+    FILE* f;
+    f = fopen("teste.txt", "wb");
+    verifica_arquivo(f);
+
+    //Cria um cabecalho auxiliar
+    Cabecalho cab;
+    cab.status = 1;          //consistente
+    cab.topoPilha = -1;      //pilha vazia por enquanto
+
+    //Escreve o cabecalho no arquivo
+    fwrite(&cab, sizeof(cab), 1, f);
+
+    //Escreve todos os registros no arquivo na ordem correta
+    for (int i = 0; i < qtdRegs; ++i){
+        fprintf(f, "%d\n", reg[i].codINEP); 
+        fprintf(f, "%s\n", reg[i].dataAtiv);
+        fprintf(f, "%s\n", reg[i].uf);
+        fprintf(f, "%d\n", reg[i].tam_nomEscola);
+        fprintf(f, "%s\n", reg[i].nomEscola);
+        fprintf(f, "%d\n", reg[i].tam_municipio);
+        fprintf(f, "%s\n", reg[i].municipio);
+        fprintf(f, "%d\n", reg[i].tam_prestadora);
+        fprintf(f, "%s\n", reg[i].prestadora);
+    }
 }
