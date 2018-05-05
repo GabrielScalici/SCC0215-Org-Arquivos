@@ -78,7 +78,7 @@ Registro *recuperar_registros(FILE *f){
                 i++;
             }
         } while (c != ';' && c != '\n' && c != EOF );
-        carac[i+1] = '\0';
+        carac[i] = '\0';
 
             if(alternando == 0){//colocando no campos campos prestadora e tam_prestadora
                 reg[qtd].prestadora = carac;
