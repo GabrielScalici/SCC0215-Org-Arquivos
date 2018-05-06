@@ -72,36 +72,39 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
 
         if(i > 0){    //caso o campo nao esteja preenchido
             if(alternando == 0){//colocando no campos campos prestadora e tam_prestadora
-                reg[qtd].prestadora = carac;
-                reg[qtd].tam_prestadora = i;
-                printf("\n\n%d\nPrestadora: %s\n",qtd, reg[qtd].prestadora);
+                reg[qtd].prestadora = (char*) malloc(sizeof(char)*(strlen(carac)));
+                strncpy(reg[qtd].prestadora, carac,strlen(carac));
+                reg[qtd].tam_prestadora = strlen(carac);
+                //printf("\n\n%d\nPrestadora: %s\n",qtd, reg[qtd].prestadora);
                 alternando=1;
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
                 strcpy(reg[qtd].dataAtiv, carac);
-                printf("Data:%s\n", reg[qtd].dataAtiv);
+                // printf("Data:%s\n", reg[qtd].dataAtiv);
                 alternando=2;
             }
             else if(alternando == 2){//colocando no campo de codINEP
                 reg[qtd].codINEP = atoi(carac);
-                printf("codINEP:%d\n", reg[qtd].codINEP);
+                // printf("codINEP:%d\n", reg[qtd].codINEP);
                 alternando=3;
             }
             else if(alternando == 3){//colocando nos campos nomEscola e tam_nomEscola 
-                reg[qtd].nomEscola = carac;
-                reg[qtd].tam_nomEscola = i;
-                printf("nomEscola:%s\n", reg[qtd].nomEscola);
+                reg[qtd].nomEscola = (char*) malloc(sizeof(char)*(strlen(carac)));
+                strcpy(reg[qtd].nomEscola, carac);
+                reg[qtd].tam_nomEscola = strlen(carac);
+                // printf("nomEscola:%s\n", reg[qtd].nomEscola);
                 alternando=4;
             }
             else if(alternando == 4){//colocando nos campos municipio e tam_municipio
-                reg[qtd].municipio = carac;
-                reg[qtd].tam_municipio = i;
-                printf("Municipio:%s\n", reg[qtd].municipio);
+               // reg[qtd].municipio= (char*) malloc(sizeof(char)*i);
+               // strcpy(reg[qtd].municipio, carac);
+                reg[qtd].tam_municipio = strlen(carac);
+               // printf("Municipio:%s\n", reg[qtd].municipio);
                 alternando=5;
             }
             else if(alternando == 5){//colocando no campo de uf
                 strcpy(reg[qtd].uf, carac);
-                printf("UF:%s\n", reg[qtd].uf);
+               // printf("UF:%s\n", reg[qtd].uf);
                 qtd++;
                 alternando=0;
             }
@@ -111,7 +114,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
             i = 0;
-            printf("-----------------------\n");
+           // printf("-----------------------\n");
         
         if(feof(f)) break; //ou c == EOF (?)
     }
@@ -142,9 +145,9 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
         fprintf(f, "%s\n", reg[i].uf);
         fprintf(f, "%d\n", reg[i].tam_nomEscola);
         fprintf(f, "%s\n", reg[i].nomEscola);
-        fprintf(f, "%d\n", reg[i].tam_municipio);
-        fprintf(f, "%s\n", reg[i].municipio);
-        fprintf(f, "%d\n", reg[i].tam_prestadora);
-        fprintf(f, "%s\n", reg[i].prestadora);
+      // fprintf(f, "%d\n", reg[i].tam_municipio);
+      //  fprintf(f, "%s\n", reg[i].municipio);
+       // fprintf(f, "%d\n", reg[i].tam_prestadora);
+      //  fprintf(f, "%s\n", reg[i].prestadora);
     }
 }
