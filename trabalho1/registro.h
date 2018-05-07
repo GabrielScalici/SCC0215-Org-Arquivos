@@ -1,6 +1,7 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
 
+#include <stdio.h>
 //Definindo o tamanho do registro
 #define TAM_REG 87
 //Definindo o delimitador de campo
@@ -36,5 +37,6 @@ FILE* cria_arquivo();
 void verifica_arquivo(FILE *f);
 Registro* recuperar_registros(FILE *f,int qtdRegs);
 void transfere_arquivo(Registro* reg, int qtdRegs);
+void busca_rrn(int RRN);
 
 #endif

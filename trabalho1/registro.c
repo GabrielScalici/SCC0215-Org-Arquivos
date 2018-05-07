@@ -128,7 +128,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
 //funcao pra tranferir os registros para o arquivo de saida ja com o cabecalho
 void transfere_arquivo(Registro* reg, int qtdRegs){
     FILE* f;
-    f = fopen("teste.txt", "wb");
+    f = fopen("teste.bin", "wb");
     verifica_arquivo(f);
 
     //Cria um cabecalho auxiliar
@@ -141,7 +141,8 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
 
     //Escreve todos os registros no arquivo na ordem correta
     for (int i = 0; i < qtdRegs; ++i){
-        fprintf(f, "%d  ", reg[i].codINEP);
+      fwrite(&reg[i], sizeof(Registro), 1,f);
+    /*    fprintf(f, "%d  ", reg[i].codINEP);
         fprintf(f, "%s  ", reg[i].dataAtiv);
         fprintf(f, "%s  ", reg[i].uf);
         fprintf(f, "%d ", reg[i].tamEscola);
@@ -149,6 +150,49 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
         fprintf(f, "%d ", reg[i].tam_municipio);
         fprintf(f, "%s  ", reg[i].municipio);
         fprintf(f, "%d ", reg[i].tam_prestadora);
-        fprintf(f, "%s\n", reg[i].prestadora);
+        fprintf(f, "%s\n", reg[i].prestadora);*/
     }
+    fclose(f);
+}
+
+void busca_rrn(int RRN){
+    //Abrindo o arquivo e verificando sua condição
+    FILE *f = fopen("teste.txt", "rb");
+    verifica_arquivo(f);
+
+    Registro reg;
+    char c;
+
+    fseek(f, 5*sizeof(char), SEEK_SET);///Pula o topo da Pilha
+    fseek(f, RRN * sizeof(Registro), SEEK_CUR);///Procura o registro pelo RRN
+
+
+    //Lendo o primeiro caracter e analisando
+    fread(&c, sizeof(char), 1, f);
+
+    if((c == '*') || (feof(f))){
+        ///Arquivo removido ou RRN não existe
+        printf("\nRegistro inexistente.\n");
+        fclose(f);
+        return;
+    }
+    else{
+        fseek(f, -sizeof(char), SEEK_CUR);///Retorna o ponteiro uma posicao pois foi checado o REMOVIDO
+        fread(&reg, sizeof(reg), 1, f);
+
+        //fscanf(f, "%d" , &reg.codINEP);
+        printf("code = %d  ", reg.codINEP);
+        printf("data = %s  ", reg.dataAtiv);
+        printf("uf = %s  ", reg.uf);
+        printf("tamesc = %d ", reg.tamEscola);
+        printf("nomescola= %s  ", reg.nomEscola);
+        printf("tam muni= %d ", reg.tam_municipio);
+        printf("muni = %s  ", reg.municipio);
+        printf("tamprest= %d ", reg.tam_prestadora);
+        printf("prest= %s\n", reg.prestadora);
+
+    }
+
+    fclose(f);
+
 }
