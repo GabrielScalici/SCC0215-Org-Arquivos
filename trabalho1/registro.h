@@ -1,6 +1,5 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
-
 #include <stdio.h>
 //Definindo o tamanho do registro
 #define TAM_REG 87
@@ -19,8 +18,8 @@
 //Definindo os registros
 typedef struct{
     int codINEP;
-    char dataAtiv[10];
-    char uf[2];
+    char* dataAtiv;
+    char* uf;
     int tam_nomEscola;
     int tamEscola;
     char* nomEscola;

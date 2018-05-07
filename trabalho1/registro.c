@@ -69,6 +69,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
         } while (c != ';' && c != '\n' && c != EOF );
         carac[i] = '\0';
+
         if(i > 0){    //caso o campo nao esteja preenchido
             if(alternando == 0){//colocando no campos campos prestadora e tam_prestadora
                 reg[qtd].tam_prestadora = i;
@@ -78,6 +79,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
                 alternando=1;
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
+                reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
                 strncpy(reg[qtd].dataAtiv, carac,10);
                 // printf("Data:%s\n", reg[qtd].dataAtiv);
                 alternando=2;
@@ -101,11 +103,10 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
                // printf("Municipio:%s\n", reg[qtd].municipio);
                 alternando=5;
             }
-
             else if(alternando == 5){//colocando no campo de uf
-
-                strncpy(reg[qtd].uf, carac, 2);
-
+                reg[qtd].uf = (char*) malloc(sizeof(char)*2);
+                strcpy(reg[qtd].uf, carac);
+               // printf("UF:%s\n", reg[qtd].uf);
                 qtd++;
                 alternando=0;
             }
@@ -121,14 +122,15 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
     }
 
     fclose(f);  //Tira o arquivo da memória
-
     return reg;
 }
 
 //funcao pra tranferir os registros para o arquivo de saida ja com o cabecalho
 void transfere_arquivo(Registro* reg, int qtdRegs){
     FILE* f;
-    f = fopen("teste.bin", "wb");
+    int tamAtual;
+    char c = '0';
+    f = fopen("teste.bin", "r+b");
     verifica_arquivo(f);
 
     //Cria um cabecalho auxiliar
@@ -137,22 +139,42 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
     cab.topoPilha = -1;      //pilha vazia por enquanto
 
     //Escreve o cabecalho no arquivo
-    fwrite(&cab, sizeof(cab), 1, f);
+    fwrite(&cab.status, sizeof(char), 1, f);
+    fwrite(&cab.topoPilha,sizeof(int),1,f);
+    printf("%c \n",cab.status);
+    printf("%d \n",cab.topoPilha);
+
 
     //Escreve todos os registros no arquivo na ordem correta
     for (int i = 0; i < qtdRegs; ++i){
-      fwrite(&reg[i], sizeof(Registro), 1,f);
-    /*    fprintf(f, "%d  ", reg[i].codINEP);
-        fprintf(f, "%s  ", reg[i].dataAtiv);
-        fprintf(f, "%s  ", reg[i].uf);
-        fprintf(f, "%d ", reg[i].tamEscola);
-        fprintf(f, "%s  ", reg[i].nomEscola);
-        fprintf(f, "%d ", reg[i].tam_municipio);
-        fprintf(f, "%s  ", reg[i].municipio);
-        fprintf(f, "%d ", reg[i].tam_prestadora);
-        fprintf(f, "%s\n", reg[i].prestadora);*/
+        fwrite(&reg[i].codINEP,sizeof(int),1,f);
+        fwrite(&reg[i].dataAtiv,(10*sizeof(char)),1,f);
+        fwrite(&reg[i].uf,(2*sizeof(char)),1,f);
+        fwrite(&reg[i].tamEscola,sizeof(int),1,f);
+        fwrite(&reg[i].nomEscola,reg[i].tamEscola,1,f);
+        fwrite(&reg[i].tam_municipio,sizeof(int),1,f);
+        fwrite(&reg[i].municipio,reg[i].tam_municipio,1,f);
+        fwrite(&reg[i].tam_prestadora,sizeof(int),1,f);
+        fwrite(&reg[i].prestadora,reg[i].tam_prestadora,1,f);
+
+       /*Testando no terminal as variaves
+        printf("%d ", reg[i].codINEP);
+        printf("%s ", reg[i].dataAtiv);
+        printf("%s ", reg[i].uf);
+        printf("%d-", reg[i].tamEscola);
+        printf("%s ", reg[i].nomEscola);
+        printf("%d-", reg[i].tam_municipio);
+        printf("%s ", reg[i].municipio);
+        printf("%d-", reg[i].tam_prestadora);
+        printf("%s \n", reg[i].prestadora);
+
+       */
+        tamAtual = (((28 + reg[i].tamEscola) + reg[i].tam_municipio) + reg[i].tam_prestadora);
+        if(tamAtual < TAM_REG){
+        	for(int i =0; i< (TAM_REG - tamAtual);i++)fwrite(&c,sizeof(char),1,f);
+        }
+       // fwrite(&reg[i],TAM_REG, 1, f);
     }
-    fclose(f);
 }
 
 void busca_rrn(int RRN){
@@ -208,7 +230,7 @@ void remover_registro_rrn(int RRN){
     //Pular o status do cabecalho
     fseek(f, sizeof(char), SEEK_SET);
 
-	  //Le o RRN no topo da pilha.
+    //Le o RRN no topo da pilha.
     fread(&aux_pilha, sizeof(int), 1, f);
     //printf("%d ", &aux_pilha);
 
@@ -236,9 +258,9 @@ void remover_registro_rrn(int RRN){
 
         //Pular o status do cabecalho e atualiza o topo da pilha
         fseek(f, sizeof(char), SEEK_SET);
-        fwrite(&aux_topo, sizeof(int), 1, f);
+        fwrite(&RRN, sizeof(int), 1, f);
 
-
+        
         //Indicando para o usuário que foi removido com sucesso
         printf("Registro removido com sucesso.\n");
 
