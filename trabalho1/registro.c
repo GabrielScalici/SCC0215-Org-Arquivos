@@ -133,7 +133,7 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
 
     //Cria um cabecalho auxiliar
     Cabecalho cab;
-    cab.status = 1;          //consistente
+    cab.status = '1';          //consistente
     cab.topoPilha = -1;      //pilha vazia por enquanto
 
     //Escreve o cabecalho no arquivo
