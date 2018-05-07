@@ -196,3 +196,55 @@ void busca_rrn(int RRN){
     fclose(f);
 
 }
+
+void remover_registro_rrn(int RRN){
+
+    FILE *f = fopen("teste.txt", "r+b");
+    verifica_arquivo(f);
+    //Variaveis auxiliares
+    int aux_pilha;
+    char c;
+
+    //Pular o status do cabecalho
+    fseek(f, sizeof(char), SEEK_SET);
+
+	  //Le o RRN no topo da pilha.
+    fread(&aux_pilha, sizeof(int), 1, f);
+    //printf("%d ", &aux_pilha);
+
+    //Vai ate o registro que se deseja remover.
+    fseek(f, RRN * sizeof(Registro), SEEK_CUR);
+    //Le o primeiro caracter para saber se ja foi removido.
+    fread(&c, sizeof(char), 1, f);
+    if((c == '*') || (feof(f)))///Caso tenha sido removido ou tenha chegado no fim do arquivo, para a funcao.
+    {
+        printf("Registro inexistente.\n");
+        fclose(f);
+        return;
+    }else{
+        //Caso ainda nao tenha sido removido
+        fseek(f, -sizeof(char), SEEK_CUR); //Volta uma posição para a primeira do registro
+        //Armazenando na variavel auxiliar o valor para indicar remoção logica
+        c = '*';
+        fwrite(&c, sizeof(char), 1, f);
+
+        //Atualizando os valores da pilha com o removido
+        fwrite(&aux_topo, sizeof(int), 1, f);
+
+        //Atualizar o topo da pilha com o valor desse RRN
+        fseek(f, 0, SEEK_SET);
+
+        //Pular o status do cabecalho e atualiza o topo da pilha
+        fseek(f, sizeof(char), SEEK_SET);
+        fwrite(&aux_topo, sizeof(int), 1, f);
+
+
+        //Indicando para o usuário que foi removido com sucesso
+        printf("Registro removido com sucesso.\n");
+
+        fclose(f);
+    }
+
+    fclose(f);
+
+}

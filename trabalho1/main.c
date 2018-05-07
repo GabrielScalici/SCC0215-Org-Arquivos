@@ -7,7 +7,7 @@ enum options{
   RECUPERA,
   BUSCAPARAM,
   BUSCARRN = 4,
-  REMOCAO,
+  REMOCAO = 5,
   INSERE,
   ATUALIZA,
   COMPACTA,
@@ -67,6 +67,10 @@ int main(int argc, char *argv[]){
     case(BUSCARRN):{
       int rrn = atoi(argv[2]);
       busca_rrn(rrn);
+    }
+    case(REMOCAO):{
+      int rrn = atoi(argv[2]);
+      remover_registro_rrn(rrn);
     }
 
   }
