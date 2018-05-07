@@ -21,7 +21,7 @@ typedef struct{
     int codINEP;
     char dataAtiv[10];
     char uf[2];
-    int tam_nomEscola;
+    int tamEscola;
     char* nomEscola;
     int tam_municipio;
     char* municipio;

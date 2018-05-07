@@ -16,6 +16,7 @@ enum options{
 
 int main(int argc, char *argv[]){
   FILE *f;
+  Cabecalho cab;  //Cabeçalho do arquivo
   Registro *reg;  //Vetor de registros
   int qtdRegs;    //Quantidade de registros no arquivo
 
@@ -25,8 +26,10 @@ int main(int argc, char *argv[]){
     case(LEITURA):{
       int tam;    //Tamanho do arquivo
       int i;
+      char c;
 
       f = cria_arquivo(argv[2]);  //argv[2] = nome do arquivo
+      cab.status = '0';
       
       //Descobre tamanho do arquivo e volta para o início do mesmo
       fseek(f, 0, SEEK_END);
@@ -37,6 +40,7 @@ int main(int argc, char *argv[]){
       qtdRegs = tam/TAM_REG;
 
       reg = recuperar_registros(f, qtdRegs);
+                
       transfere_arquivo(reg, qtdRegs);
 
       break;
@@ -47,5 +51,5 @@ int main(int argc, char *argv[]){
     }
   
   }
-  return 0;
+return 0;
 }
