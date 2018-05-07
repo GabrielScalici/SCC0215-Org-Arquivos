@@ -32,14 +32,27 @@ int main(int argc, char *argv[]){
       cab.status = '0';
       
       //Descobre tamanho do arquivo e volta para o início do mesmo
-      fseek(f, 0, SEEK_END);
-      tam = ftell(f);
-      fseek(f, 0, SEEK_SET);
+    qtdRegs=0;
+    i=0;
+    c = fgetc(f);
+    while(c!= EOF){
+      if(c == '\n')qtdRegs++;
+      c = fgetc(f);
+    }
 
-      //Como os registros são de tamanho fixo, é possível calcular a quantidade de registros
-      qtdRegs = tam/TAM_REG;
-
-      reg = recuperar_registros(f, qtdRegs);
+    fseek(f, 0, SEEK_SET);
+    
+    printf("%d\n",qtdRegs);
+      reg = recuperar_registros(f,qtdRegs);
+              
+     //           printf("\n\n0\t Prestadora: %s - %d\n", reg[1].prestadora, reg[1].tam_prestadora);
+   //             printf("Data:%s\n", reg[1].dataAtiv);
+       //         printf("codINEP:%d\n", reg[1].codINEP);
+              // printf("nomEscola:%s\n", reg[1].nomEscola);
+                printf("TAM nomEscola:%d\n", reg[0].tamEscola);
+             //   printf("UF:%s\n", reg[1].uf);
+               // printf("Municipio:%s\n", reg[1].municipio);
+                
                 
       transfere_arquivo(reg, qtdRegs);
 
