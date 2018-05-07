@@ -127,7 +127,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
 //funcao pra tranferir os registros para o arquivo de saida ja com o cabecalho
 void transfere_arquivo(Registro* reg, int qtdRegs){
     FILE* f;
-    f = fopen("saida.txt", "wb");
+    f = fopen("teste.txt", "wb");
     verifica_arquivo(f);
 
     //Cria um cabecalho auxiliar

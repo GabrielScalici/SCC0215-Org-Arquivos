@@ -1,6 +1,5 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
-#include <stdio.h>
 
 //Definindo o tamanho do registro
 #define TAM_REG 87
@@ -21,6 +20,7 @@ typedef struct{
     int codINEP;
     char dataAtiv[10];
     char uf[2];
+    int tam_nomEscola;
     int tamEscola;
     char* nomEscola;
     int tam_municipio;
@@ -34,7 +34,7 @@ typedef struct{
  */
 FILE* cria_arquivo();
 void verifica_arquivo(FILE *f);
-Registro *recuperar_registros(FILE *f, int qtdRegs);
+Registro* recuperar_registros(FILE *f,int qtdRegs);
 void transfere_arquivo(Registro* reg, int qtdRegs);
 
 #endif

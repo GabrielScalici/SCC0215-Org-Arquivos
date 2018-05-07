@@ -1,15 +1,14 @@
-SOURCES = main.c registro.c
-HEADERS = registro.h
-FLAGS = -Wall
-PROGRAMA = programaTrab1
+all: main.o registro.o
+	gcc main.o registro.o -o main -lm
+	
+main.o: main.c registro.h
+	gcc -c main.c -o main.o
 
-all: $(PROGRAMA)
+registro.o: registro.c registro.h
+	gcc -c registro.c -o registro.o
 
-$(PROGRAMA): $(SOURCES) $(HEADERS)
-	@gcc $(FLAGS) $(SOURCES) -o $(PROGRAMA)
+run:main
+	./main 1 turmaB-dadosPBLE.csv
 
 clean:
-	@rm -rf *.o *~
-
-run:
-	./$(PROGRAMA)
+	rm -rf *o main
