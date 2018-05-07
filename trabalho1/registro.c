@@ -32,12 +32,12 @@
 FILE* cria_arquivo(char *arquivo){
     FILE *f;
     Registro *reg;
-    
+
     f = fopen(arquivo, "rb");       //Abre o arquivo em modo de leitura binária
     verifica_arquivo(f);            //Verifica se o arquivo abriu corretamente
 
-    printf("Arquivo carregado.\n"); 
-    
+    printf("Arquivo carregado.\n");
+
     return f;
 }
 
@@ -58,7 +58,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
 
     //Aloca a quantidade de memória necessária
     reg = (Registro *) calloc(qtdRegs, sizeof(Registro));
-    
+
     while(1){
         char* carac= (char*)calloc(80, sizeof(char));
         do{
@@ -69,7 +69,6 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
         } while (c != ';' && c != '\n' && c != EOF );
         carac[i] = '\0';
-
         if(i > 0){    //caso o campo nao esteja preenchido
             if(alternando == 0){//colocando no campos campos prestadora e tam_prestadora
                 reg[qtd].tam_prestadora = i;
@@ -88,7 +87,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
                 // printf("codINEP:%d\n", reg[qtd].codINEP);
                 alternando=3;
             }
-            else if(alternando == 3){//colocando nos campos nomEscola e tam_nomEscola 
+            else if(alternando == 3){//colocando nos campos nomEscola e tam_nomEscola
                 reg[qtd].tamEscola = i;
                 reg[qtd].nomEscola = (char*) malloc(sizeof(char)*(strlen(carac)));
                 strncpy(reg[qtd].nomEscola, carac, strlen(carac));
@@ -102,20 +101,22 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
                // printf("Municipio:%s\n", reg[qtd].municipio);
                 alternando=5;
             }
+
             else if(alternando == 5){//colocando no campo de uf
-                strcpy(reg[qtd].uf, carac);
-               // printf("UF:%s\n", reg[qtd].uf);
+
+                strncpy(reg[qtd].uf, carac, 2);
+
                 qtd++;
                 alternando=0;
             }
-        }  
+        }
         else alternando++;  //se houver um campo sem informacao pula para o proximo campo
 
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
             i = 0;
            // printf("-----------------------\n");
-        
+
         if(feof(f)) break; //ou c == EOF (?)
     }
 
@@ -140,7 +141,7 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
 
     //Escreve todos os registros no arquivo na ordem correta
     for (int i = 0; i < qtdRegs; ++i){
-        fprintf(f, "%d  ", reg[i].codINEP); 
+        fprintf(f, "%d  ", reg[i].codINEP);
         fprintf(f, "%s  ", reg[i].dataAtiv);
         fprintf(f, "%s  ", reg[i].uf);
         fprintf(f, "%d ", reg[i].tamEscola);
