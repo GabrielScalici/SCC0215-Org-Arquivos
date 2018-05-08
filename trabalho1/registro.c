@@ -343,10 +343,13 @@ void recuperar_arquivo(){
     //Leitura de todos os registros
     while(!feof(f)){
         reg = (Registro *) realloc(reg, sizeof(Registro) * (qtd+1));
-        fread(&reg[qtd++], sizeof(Registro), 1, f);
+        fread(&reg[qtd], sizeof(Registro), 1, f);
+        // printf("%d\n", qtd);
+        qtd++;
+        // if(feof(f)) break;
     }
 
-    printf("Vai imprimir\n");
+    // printf("Vai imprimir\n");
     //Impressão de todos os registros
     for(i = 0;i < qtd;i++){
         printf("%d ", reg[i].codINEP);
