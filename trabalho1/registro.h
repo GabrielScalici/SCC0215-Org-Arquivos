@@ -38,5 +38,6 @@ void transfere_arquivo(Registro* reg, int qtdRegs);
 void busca_rrn(int RRN);
 void remover_registro_rrn(int RRN);
 void recuperar_arquivo();
+void recupera_rrn();
 
 #endif

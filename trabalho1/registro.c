@@ -362,3 +362,55 @@ void recuperar_arquivo(){
 
     fclose(f);  //Fecha o arquivo
 }
+
+void recupera_rrn(){
+  int status = 0;
+
+  //Abrindo o arquivo
+  FILE *f = fopen("teste.bin", "r+b");
+  verifica_arquivo(f);
+
+  //Alterar o status
+  fwrite(&status, sizeof(char), 1, f);
+
+  //Variaveis auxiliares
+  int rrn_topo_pilha;
+  int rrn_prox_pilha;
+
+  //Le o RRN no topo da pilha.
+  fread(&rrn_topo_pilha, sizeof(int), 1, f);
+
+  if(rrn_topo_pilha != -1){
+
+    rrn_prox_pilha = rrn_topo_pilha;
+
+    do{
+      //Printa o primeiro rrn removido
+      printf("%d ", rrn_prox_pilha);
+
+      ///Vai para o RRN desejado
+      fseek(f, (rrn_prox_pilha * 87) + 5, SEEK_SET);
+
+      //Pular o primeiro valor que indica que foi removido
+      fseek(f, sizeof(int), SEEK_CUR);
+
+      //Pegar o proximo item na pilha
+      fread(&rrn_prox_pilha, sizeof(int), 1, f);
+
+      //Enquanto nao encontrar o fim (nao exibir -1)
+    }while(rrn_prox_pilha != -1);
+
+    printf("\n");
+
+  }else{
+    printf("Pilha vazia.");
+  }
+
+  status = 1;
+  //Voltando para atualizar o status
+  fseek(f, 0, SEEK_SET);
+  fwrite(&status, sizeof(char), 1, f);
+  fclose(f);
+
+
+}

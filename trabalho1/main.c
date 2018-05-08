@@ -11,7 +11,7 @@ enum options{
   INSERE,
   ATUALIZA,
   COMPACTA,
-  RECUPERAREMOVIDOS
+  RECUPERAREMOVIDOS = 9
 };
 
 int main(int argc, char *argv[]){
@@ -70,6 +70,10 @@ int main(int argc, char *argv[]){
     case(REMOCAO):{
         int rrn = atoi(argv[2]);
         remover_registro_rrn(rrn);
+        break;
+    }
+    case(RECUPERAREMOVIDOS):{
+        recupera_rrn();
         break;
     }
 
