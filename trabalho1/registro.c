@@ -270,3 +270,40 @@ void remover_registro_rrn(int RRN){
     fclose(f);
 
 }
+
+void recuperar_arquivo(){
+    FILE *f;
+    Cabecalho cab;
+    Registro *reg = NULL;
+    int qtd = 0;
+    int i = 0;
+
+    f = fopen("teste.bin", "rb");
+
+    verifica_arquivo(f);    //Verifica se carregou o arquivo
+    // printf("Arquivo aberto\n");
+
+    fread(&cab, sizeof(cab), 1, f);     
+    if(cab.status == '0')   exit(-1);   //Arquivo inconsistente
+
+    //Leitura de todos os registros
+    while(!feof(f)){
+        reg = (Registro *) realloc(reg, sizeof(Registro) * (qtd+1));
+        fread(&reg[qtd++], sizeof(Registro), 1, f);
+    }
+
+    //Impressão de todos os registros
+    for(i = 0;i < qtd;i++){
+        printf("%d ", reg[i].codINEP); 
+        printf("%s ", reg[i].dataAtiv);
+        printf("%s ", reg[i].uf);
+        printf("%d ", reg[i].tamEscola);
+        printf("%s ", reg[i].nomEscola);
+        printf("%d ", reg[i].tam_municipio);
+        printf("%s ", reg[i].municipio);
+        printf("%d ", reg[i].tam_prestadora);
+        printf("%s\n", reg[i].prestadora);
+    }
+
+    fclose(f);  //Fecha o arquivo
+}

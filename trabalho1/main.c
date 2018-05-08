@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
       break;
     }
     case(RECUPERA):{
-      //todo
+      recuperar_arquivo();
       break;
     }
     case(BUSCARRN):{
