@@ -65,10 +65,12 @@ int main(int argc, char *argv[]){
     case(BUSCARRN):{
         int rrn = atoi(argv[2]);
         busca_rrn(rrn);
+        break;
     }
     case(REMOCAO):{
         int rrn = atoi(argv[2]);
         remover_registro_rrn(rrn);
+        break;
     }
   
   }

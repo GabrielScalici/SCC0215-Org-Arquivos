@@ -130,7 +130,7 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
     FILE* f;
     int tamAtual;
     char c = '0';
-    f = fopen("teste.bin", "r+b");
+    f = fopen("teste.bin", "wb");
     verifica_arquivo(f);
 
     //Cria um cabecalho auxiliar
@@ -251,7 +251,7 @@ void remover_registro_rrn(int RRN){
         fwrite(&c, sizeof(char), 1, f);
 
         //Atualizando os valores da pilha com o removido
-        fwrite(&aux_topo, sizeof(int), 1, f);
+        fwrite(&aux_pilha, sizeof(int), 1, f);
 
         //Atualizar o topo da pilha com o valor desse RRN
         fseek(f, 0, SEEK_SET);
@@ -281,7 +281,7 @@ void recuperar_arquivo(){
     f = fopen("teste.bin", "rb");
 
     verifica_arquivo(f);    //Verifica se carregou o arquivo
-    // printf("Arquivo aberto\n");
+    printf("Arquivo aberto\n");
 
     fread(&cab, sizeof(cab), 1, f);     
     if(cab.status == '0')   exit(-1);   //Arquivo inconsistente
@@ -292,6 +292,7 @@ void recuperar_arquivo(){
         fread(&reg[qtd++], sizeof(Registro), 1, f);
     }
 
+    printf("Vai imprimir\n");
     //Impressão de todos os registros
     for(i = 0;i < qtd;i++){
         printf("%d ", reg[i].codINEP); 
