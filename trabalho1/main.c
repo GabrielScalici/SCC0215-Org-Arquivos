@@ -8,7 +8,7 @@ enum options{
   BUSCAPARAM,
   BUSCARRN = 4,
   REMOCAO = 5,
-  INSERE,
+  INSERE = 6,
   ATUALIZA,
   COMPACTA,
   RECUPERAREMOVIDOS = 9
@@ -74,6 +74,18 @@ int main(int argc, char *argv[]){
     }
     case(RECUPERAREMOVIDOS):{
         recupera_rrn();
+        break;
+    }
+    case(INSERE):{
+        int cod = atoi(argv[2]);
+        char* data = argv[3];
+        char* uf = argv[4];
+        char* nome_esc = argv[5];
+        char* muni = argv[6];
+        char* prest = argv[7];
+
+        inserir_registro(cod, data, uf, nome_esc, muni, prest);
+
         break;
     }
 
