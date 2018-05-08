@@ -148,14 +148,14 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
     //Escreve todos os registros no arquivo na ordem correta
     for (int i = 0; i < qtdRegs; ++i){
         fwrite(&reg[i].codINEP,sizeof(int),1,f);
-        fwrite(&reg[i].dataAtiv,(10*sizeof(char)),1,f);
-        fwrite(&reg[i].uf,(2*sizeof(char)),1,f);
+        fwrite(reg[i].dataAtiv,sizeof(char),10,f);
+        fwrite(reg[i].uf,sizeof(char),2,f);
         fwrite(&reg[i].tamEscola,sizeof(int),1,f);
-        fwrite(&reg[i].nomEscola,reg[i].tamEscola,1,f);
+        fwrite(reg[i].nomEscola,reg[i].tamEscola,1,f);
         fwrite(&reg[i].tam_municipio,sizeof(int),1,f);
-        fwrite(&reg[i].municipio,reg[i].tam_municipio,1,f);
+        fwrite(reg[i].municipio,reg[i].tam_municipio,1,f);
         fwrite(&reg[i].tam_prestadora,sizeof(int),1,f);
-        fwrite(&reg[i].prestadora,reg[i].tam_prestadora,1,f);
+        fwrite(reg[i].prestadora,reg[i].tam_prestadora,1,f);
 
        /*Testando no terminal as variaves
         printf("%d ", reg[i].codINEP);
@@ -179,39 +179,68 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
 
 void busca_rrn(int RRN){
     //Abrindo o arquivo e verificando sua condição
-    FILE *f = fopen("teste.txt", "rb");
+    FILE *f = fopen("teste.bin", "rb");
     verifica_arquivo(f);
 
-    Registro reg;
-    char c;
+    //Variavies para exibicao dos CAMPOS
+    int cod;
+    char data[11];
+    char uf[3];
+    int tam_escola;
+    char* nome_escola;
+    int tam_mun;
+    char* muni;
+    int tam_prest;
+    char* prest;
 
-    fseek(f, 5*sizeof(char), SEEK_SET);///Pula o topo da Pilha
-    fseek(f, RRN * sizeof(Registro), SEEK_CUR);///Procura o registro pelo RRN
+    //Arrumando strings para exibicao
+    data[10] = '\0';
+    uf[2] = '\0';
 
+    //Pular o topo da pilha
+    fseek(f, 5, SEEK_SET);
 
-    //Lendo o primeiro caracter e analisando
-    fread(&c, sizeof(char), 1, f);
+    ///Vai para o RRN desejado
+    fseek(f, RRN * 87, SEEK_CUR);
 
-    if((c == '*') || (feof(f))){
+    //Lendo o primeiro caracter e analisando se o registro foi removido
+    int rem;
+    fread(&rem , sizeof(int), 1, f);
+    if((rem == -1) || (feof(f))){
         ///Arquivo removido ou RRN não existe
         printf("\nRegistro inexistente.\n");
         fclose(f);
         return;
     }
     else{
-        fseek(f, -sizeof(char), SEEK_CUR);///Retorna o ponteiro uma posicao pois foi checado o REMOVIDO
-        fread(&reg, sizeof(reg), 1, f);
+        //Retorna para a posição no início do registro
+        fseek(f, -sizeof(int), SEEK_CUR);
 
-        //fscanf(f, "%d" , &reg.codINEP);
-        printf("code = %d  ", reg.codINEP);
-        printf("data = %s  ", reg.dataAtiv);
-        printf("uf = %s  ", reg.uf);
-        printf("tamesc = %d ", reg.tamEscola);
-        printf("nomescola= %s  ", reg.nomEscola);
-        printf("tam muni= %d ", reg.tam_municipio);
-        printf("muni = %s  ", reg.municipio);
-        printf("tamprest= %d ", reg.tam_prestadora);
-        printf("prest= %s\n", reg.prestadora);
+        //Lendo Campo por campo do registro
+          fread(&cod, sizeof(int), 1, f);
+          printf("%d ", cod);
+          fread(data, sizeof(char), 10, f);
+          printf("%s ", data);
+          fread(uf, sizeof(char), 2, f);
+          printf("%s ", uf);
+          fread(&tam_escola, sizeof(int), 1, f);
+          printf("%d ", tam_escola);
+          nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
+          nome_escola[tam_escola] = '\0';
+          fread(nome_escola, tam_escola, 1, f);
+          printf("%s ", nome_escola);
+          fread(&tam_mun, sizeof(int), 1, f);
+          printf("%d ", tam_mun);
+          muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
+          muni[tam_mun] = '\0';
+          fread(muni, tam_mun, 1, f);
+          printf("%s ", muni);
+          fread(&tam_prest, sizeof(int), 1, f);
+          printf("%d ", tam_prest);
+          prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
+          prest[tam_prest] = '\0';
+          fread(prest, tam_prest, 1, f);
+          printf("%s\n", prest);
 
     }
 
@@ -260,7 +289,7 @@ void remover_registro_rrn(int RRN){
         fseek(f, sizeof(char), SEEK_SET);
         fwrite(&RRN, sizeof(int), 1, f);
 
-        
+
         //Indicando para o usuário que foi removido com sucesso
         printf("Registro removido com sucesso.\n");
 
@@ -283,7 +312,7 @@ void recuperar_arquivo(){
     verifica_arquivo(f);    //Verifica se carregou o arquivo
     printf("Arquivo aberto\n");
 
-    fread(&cab, sizeof(cab), 1, f);     
+    fread(&cab, sizeof(cab), 1, f);
     if(cab.status == '0')   exit(-1);   //Arquivo inconsistente
 
     //Leitura de todos os registros
@@ -295,7 +324,7 @@ void recuperar_arquivo(){
     printf("Vai imprimir\n");
     //Impressão de todos os registros
     for(i = 0;i < qtd;i++){
-        printf("%d ", reg[i].codINEP); 
+        printf("%d ", reg[i].codINEP);
         printf("%s ", reg[i].dataAtiv);
         printf("%s ", reg[i].uf);
         printf("%d ", reg[i].tamEscola);
