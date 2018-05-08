@@ -75,48 +75,54 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
                 reg[qtd].tam_prestadora = i;
                 reg[qtd].prestadora = (char*) malloc(sizeof(char)*(strlen(carac)));
                 strncpy(reg[qtd].prestadora, carac,strlen(carac));
-                //printf("\n\n%d\nPrestadora: %s\n",qtd, reg[qtd].prestadora);
                 alternando=1;
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
                 reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
-                strncpy(reg[qtd].dataAtiv, carac,10);
-                // printf("Data:%s\n", reg[qtd].dataAtiv);
+           		strncpy(reg[qtd].dataAtiv, carac,10);
                 alternando=2;
             }
             else if(alternando == 2){//colocando no campo de codINEP
                 reg[qtd].codINEP = atoi(carac);
-                // printf("codINEP:%d\n", reg[qtd].codINEP);
                 alternando=3;
             }
             else if(alternando == 3){//colocando nos campos nomEscola e tam_nomEscola
                 reg[qtd].tamEscola = i;
                 reg[qtd].nomEscola = (char*) malloc(sizeof(char)*(strlen(carac)));
                 strncpy(reg[qtd].nomEscola, carac, strlen(carac));
-               // printf("tamEscola: %d\n", reg[qtd].tam_nomEscola);
                 alternando=4;
             }
             else if(alternando == 4){//colocando nos campos municipio e tam_municipio
                 reg[qtd].municipio= (char*) malloc(sizeof(char)*(strlen(carac)));
                 strncpy(reg[qtd].municipio, carac,strlen(carac));
                 reg[qtd].tam_municipio = strlen(carac);
-               // printf("Municipio:%s\n", reg[qtd].municipio);
                 alternando=5;
             }
             else if(alternando == 5){//colocando no campo de uf
                 reg[qtd].uf = (char*) malloc(sizeof(char)*2);
-                strcpy(reg[qtd].uf, carac);
-               // printf("UF:%s\n", reg[qtd].uf);
+                strncpy(reg[qtd].uf, carac,2);
+               // strncpy(reg[qtd].uf, carac,2);
                 qtd++;
                 alternando=0;
             }
         }
-        else alternando++;  //se houver um campo sem informacao pula para o proximo campo
-
+        else {
+        	if(alternando == 1 && carac[0]== '\0'){
+        		reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
+        		strncpy(reg[qtd].dataAtiv,"0000000000",10);
+        	}
+            else if(alternando == 5 && carac[0]== '\0'){
+                reg[qtd].uf = (char*) malloc(sizeof(char)*2);
+            	strncpy(reg[qtd].dataAtiv,"00",2);
+            }
+            else if(alternando == 0)reg[qtd].tam_prestadora = 0;
+            else if(alternando == 3)reg[qtd].tamEscola = 0;
+            else if(alternando == 4)reg[qtd].tam_municipio = 0;
+         	alternando++;  //se houver um campo sem informacao pula para o proximo campo
+		}
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
             i = 0;
-           // printf("-----------------------\n");
 
         if(feof(f)) break; //ou c == EOF (?)
     }
@@ -178,9 +184,13 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
 }
 
 void busca_rrn(int RRN){
+    char status = '0';
     //Abrindo o arquivo e verificando sua condição
     FILE *f = fopen("teste.bin", "rb");
     verifica_arquivo(f);
+
+    //Alterar o status
+    fwrite(&status, sizeof(char), 1, f);
 
     //Variavies para exibicao dos CAMPOS
     int cod;
@@ -244,60 +254,75 @@ void busca_rrn(int RRN){
 
     }
 
+    status = 1;
+    //Voltando para atualizar o status
+    fseek(f, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, f);
     fclose(f);
 
 }
 
 void remover_registro_rrn(int RRN){
+    int status = 0;
 
-    FILE *f = fopen("teste.txt", "r+b");
+    //Abrindo o arquivo
+    FILE *f = fopen("teste.bin", "r+b");
     verifica_arquivo(f);
+
+    //Alterar o status
+    fwrite(&status, sizeof(char), 1, f);
+
     //Variaveis auxiliares
-    int aux_pilha;
-    char c;
+    int rrn_topo_pilha;
+    int remover = -1;
 
     //Pular o status do cabecalho
-    fseek(f, sizeof(char), SEEK_SET);
+    //fseek(f, sizeof(char), SEEK_SET);
 
     //Le o RRN no topo da pilha.
-    fread(&aux_pilha, sizeof(int), 1, f);
-    //printf("%d ", &aux_pilha);
+    fread(&rrn_topo_pilha, sizeof(int), 1, f);
 
-    //Vai ate o registro que se deseja remover.
-    fseek(f, RRN * sizeof(Registro), SEEK_CUR);
-    //Le o primeiro caracter para saber se ja foi removido.
-    fread(&c, sizeof(char), 1, f);
-    if((c == '*') || (feof(f)))///Caso tenha sido removido ou tenha chegado no fim do arquivo, para a funcao.
-    {
-        printf("Registro inexistente.\n");
+    ///Vai para o RRN desejado
+    fseek(f, RRN * 87, SEEK_CUR);
+
+    //Lendo o primeiro inteiro e analisa se o registro foi removido
+    int rem;
+    fread(&rem , sizeof(int), 1, f);
+    if((rem == -1) || (feof(f))){
+        ///Arquivo removido ou RRN não existe
+        printf("\nRegistro inexistente.\n");
         fclose(f);
         return;
     }else{
-        //Caso ainda nao tenha sido removido
-        fseek(f, -sizeof(char), SEEK_CUR); //Volta uma posição para a primeira do registro
+
+        //Retorna para a posição no início do registro
+        fseek(f, -sizeof(int), SEEK_CUR);
+
         //Armazenando na variavel auxiliar o valor para indicar remoção logica
-        c = '*';
-        fwrite(&c, sizeof(char), 1, f);
+        fwrite(&remover, sizeof(int), 1, f);
 
         //Atualizando os valores da pilha com o removido
-        fwrite(&aux_pilha, sizeof(int), 1, f);
+        fwrite(&rrn_topo_pilha, sizeof(int), 1, f);
 
         //Atualizar o topo da pilha com o valor desse RRN
         fseek(f, 0, SEEK_SET);
 
         //Pular o status do cabecalho e atualiza o topo da pilha
         fseek(f, sizeof(char), SEEK_SET);
-        fwrite(&RRN, sizeof(int), 1, f);
 
+        //Escrever no topo da pilha
+        fwrite(&RRN, sizeof(int), 1, f);
 
         //Indicando para o usuário que foi removido com sucesso
         printf("Registro removido com sucesso.\n");
-
-        fclose(f);
     }
 
-    fclose(f);
 
+    status = 1;
+    //Voltando para atualizar o status
+    fseek(f, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, f);
+    fclose(f);
 }
 
 void recuperar_arquivo(){

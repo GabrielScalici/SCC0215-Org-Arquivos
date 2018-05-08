@@ -8,7 +8,7 @@ registro.o: registro.c registro.h
 	gcc -c registro.c -o registro.o
 
 run:main
-	./main 4 1
+	./main 4 933
 
 clean:
 	rm -rf *o main
