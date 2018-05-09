@@ -321,46 +321,64 @@ void remover_registro_rrn(int RRN){
     fwrite(&status, sizeof(char), 1, f);
     fclose(f);
 }
-
-void recuperar_arquivo(){
+void printa_arquivo(){
     FILE *f;
     Cabecalho cab;
-    Registro *reg = NULL;
-    int qtd = 0;
+    Registro reg;
     int i = 0;
+    //int aux;
 
-    f = fopen("teste.bin", "rb");
+    f = fopen("teste.bin", "r+b");  //Abre o arquivo
+    verifica_arquivo(f);            //Verifica o arquivo
 
-    verifica_arquivo(f);    //Verifica se carregou o arquivo
-    printf("Arquivo aberto\n");
+    //Lê o cabeçalho
+    fread(&cab.status, sizeof(char), 1, f);
+    fread(&cab.topoPilha, sizeof(int), 1, f);
 
-    fread(&cab, sizeof(cab), 1, f);
-    if(cab.status == '0')   exit(-1);   //Arquivo inconsistente
+    // printf("%c\t%d\n", cab.status, cab.topoPilha);
 
-    //Leitura de todos os registros
     while(!feof(f)){
-        reg = (Registro *) realloc(reg, sizeof(Registro) * (qtd+1));
-        fread(&reg[qtd], sizeof(Registro), 1, f);
-        // printf("%d\n", qtd);
-        qtd++;
-        // if(feof(f)) break;
-    }
+        fread(&reg.codINEP, sizeof(int), 1, f);
+        //Quebra a execução se já for o fim do arquivo
+        //Tem que ocorrer após a primeira leitura do arquivo
+        if(feof(f)) break;
+        printf("%d ", reg.codINEP);
 
-    // printf("Vai imprimir\n");
-    //Impressão de todos os registros
-    for(i = 0;i < qtd;i++){
-        printf("%d ", reg[i].codINEP);
-        printf("%s ", reg[i].dataAtiv);
-        printf("%s ", reg[i].uf);
-        printf("%d ", reg[i].tamEscola);
-        printf("%s ", reg[i].nomEscola);
-        printf("%d ", reg[i].tam_municipio);
-        printf("%s ", reg[i].municipio);
-        printf("%d ", reg[i].tam_prestadora);
-        printf("%s\n", reg[i].prestadora);
-    }
+        reg.dataAtiv = (char *) calloc(10, sizeof(char));
+        fread(reg.dataAtiv, sizeof(char), 10, f);
+        printf("%s ", reg.dataAtiv);
+        free(reg.dataAtiv);
 
-    fclose(f);  //Fecha o arquivo
+        reg.uf = (char *) calloc(2, sizeof(char));
+        fread(reg.uf, sizeof(char), 2, f);
+        printf("%s ", reg.uf);
+        free(reg.uf);
+
+        fread(&reg.tamEscola, sizeof(int), 1, f);
+        reg.nomEscola = (char *) calloc(reg.tamEscola + 1, sizeof(char));
+        fread(reg.nomEscola, reg.tamEscola * sizeof(char), 1, f);
+        reg.nomEscola[reg.tamEscola] = '\0';
+        printf("%d %s ", reg.tamEscola, reg.nomEscola);
+        free(reg.nomEscola);
+
+        fread(&reg.tam_municipio, sizeof(int), 1, f);
+        reg.municipio = (char *) calloc(reg.tam_municipio + 1, sizeof(char));
+        fread(reg.municipio, reg.tam_municipio * sizeof(char), 1, f);
+        reg.municipio[reg.tam_municipio] = '\0';
+        printf("%d %s ", reg.tam_municipio, reg.municipio);
+        free(reg.municipio);
+
+        fread(&reg.tam_prestadora, sizeof(int), 1, f);
+        reg.prestadora = (char *) calloc(reg.tam_prestadora + 1, sizeof(char));
+        fread(reg.prestadora, reg.tam_prestadora * sizeof(char), 1, f);
+        reg.prestadora[reg.tam_prestadora] = '\0';
+        printf("%d %s\n", reg.tam_prestadora, reg.prestadora);
+        free(reg.prestadora);
+
+        i++;
+        fseek(f, (TAM_REG * i) + 5, SEEK_SET);
+    }
+    return;
 }
 
 void recupera_rrn(){
@@ -526,4 +544,108 @@ void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_
   fwrite(&status, sizeof(char), 1, f);
   fclose(f);
 
+}
+//funcao 3
+void printa_arquivo_seletivo(char* campo, char* valor){
+    FILE *f;
+    Cabecalho cab;
+    Registro *reg = NULL;
+    int i = 0;
+
+    //Variavies para exibicao dos CAMPOS
+    int cod;
+    char data[11];
+    char uf[3];
+    int tam_escola;
+    char* nome_escola;
+    int tam_mun;
+    char* muni;
+    int tam_prest;
+    char* prest;
+
+    f = fopen("teste.bin", "r+b");
+
+    verifica_arquivo(f);    //Verifica se carregou o arquivo
+    printf("Arquivo aberto\n");
+
+	fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+
+
+	if(strcmp(campo, "codINEP")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+			fseek(f,(i*87),SEEK_SET);
+		    fread(cod, sizeof(int), 1, f);
+
+		    if(cod == atoi(campo))busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+	else if(strcmp(campo, "dataAtiv")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+		    fseek(f,((i*87)+4),SEEK_SET);
+          	fread(data, sizeof(char), 10, f);
+
+		    if(strcmp(data,campo)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+	else if(strcmp(campo, "uf")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+		    fseek(f,((i*87)+14),SEEK_SET);
+	        fread(uf, sizeof(char), 2, f);
+
+		    if(strcmp(uf,campo)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+	else if(strcmp(campo, "nomeEscola")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+		    fseek(f,((i*87)+16),SEEK_SET);
+          	fread(&tam_escola, sizeof(int), 1, f);
+          	nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
+    	    nome_escola[tam_escola] = '\0';
+    	    fread(nome_escola, tam_escola, 1, f);
+
+		    if(strcmp(nome_escola,campo)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+	else if(strcmp(campo, "municipio")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+			fseek(f,(i*87)+16,SEEK_SET);
+          	fread(&tam_escola, sizeof(int), 1, f);
+			fseek(f,tam_escola,SEEK_CUR);
+          	fread(&tam_mun, sizeof(int), 1, f);
+	        muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
+    	    muni[tam_mun] = '\0';
+        	fread(muni, tam_mun, 1, f);
+
+		    if(strcmp(muni,campo)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+	else if(strcmp(campo, "prestadora")==0){
+		//Leitura de todos os registros
+		while(!feof(f)){
+			fseek(f,(i*87)+16,SEEK_SET);
+          	fread(&tam_escola, sizeof(int), 1, f);
+			fseek(f,tam_escola,SEEK_CUR);
+          	fread(&tam_mun, sizeof(int), 1, f);
+          	fseek(f,tam_mun,SEEK_CUR);
+          	fread(&tam_prest, sizeof(int), 1, f);
+          	prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
+          	prest[tam_prest] = '\0';
+          	fread(prest, tam_prest, 1, f);
+
+		    if(strcmp(prest,campo)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+		    i++;
+		}
+	}
+
+    fclose(f);  //Fecha o arquivo
 }
