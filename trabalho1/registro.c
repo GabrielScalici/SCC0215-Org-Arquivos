@@ -276,9 +276,6 @@ void remover_registro_rrn(int RRN){
     int rrn_topo_pilha;
     int remover = -1;
 
-    //Pular o status do cabecalho
-    //fseek(f, sizeof(char), SEEK_SET);
-
     //Le o RRN no topo da pilha.
     fread(&rrn_topo_pilha, sizeof(int), 1, f);
 
@@ -364,4 +361,169 @@ void recuperar_arquivo(){
     }
 
     fclose(f);  //Fecha o arquivo
+}
+
+void recupera_rrn(){
+  int status = 0;
+
+  //Abrindo o arquivo
+  FILE *f = fopen("teste.bin", "r+b");
+  verifica_arquivo(f);
+
+  //Alterar o status
+  fwrite(&status, sizeof(char), 1, f);
+
+  //Variaveis auxiliares
+  int rrn_topo_pilha;
+  int rrn_prox_pilha;
+
+  //Le o RRN no topo da pilha.
+  fread(&rrn_topo_pilha, sizeof(int), 1, f);
+
+  if(rrn_topo_pilha != -1){
+
+    rrn_prox_pilha = rrn_topo_pilha;
+
+    do{
+      //Printa o primeiro rrn removido
+      printf("%d ", rrn_prox_pilha);
+
+      ///Vai para o RRN desejado
+      fseek(f, (rrn_prox_pilha * 87) + 5, SEEK_SET);
+
+      //Pular o primeiro valor que indica que foi removido
+      fseek(f, sizeof(int), SEEK_CUR);
+
+      //Pegar o proximo item na pilha
+      fread(&rrn_prox_pilha, sizeof(int), 1, f);
+
+      //Enquanto nao encontrar o fim (nao exibir -1)
+    }while(rrn_prox_pilha != -1);
+
+    printf("\n");
+
+  }else{
+    printf("Pilha vazia.");
+  }
+
+  status = 1;
+  //Voltando para atualizar o status
+  fseek(f, 0, SEEK_SET);
+  fwrite(&status, sizeof(char), 1, f);
+  fclose(f);
+
+}
+
+void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
+  int status = 0;
+
+  //Abrindo o arquivo
+  FILE *f = fopen("teste.bin", "r+b");
+  verifica_arquivo(f);
+
+  //Alterar o status
+  fwrite(&status, sizeof(char), 1, f);
+
+  int rrn_topo_pilha;
+  int aux_prox_rrn;
+
+  //Le o RRN no topo da pilha.
+  fread(&rrn_topo_pilha, sizeof(int), 1, f);
+
+  //Checando se ha algum registro REMOVIDO
+  if(rrn_topo_pilha == -1){
+      //Caso nao tenha removido nenhum, adicionar no final do arquivo
+      fseek(f, 0, SEEK_END);
+  }
+  else{
+      //Caso haja um removido, va para ele
+      fseek(f, rrn_topo_pilha * 87, SEEK_CUR);
+
+      //Pular o primeiro valor que indica que foi removido
+      fseek(f, sizeof(int), SEEK_CUR);
+
+      //Salvar o proximo removido para atualizar o topo da pilha
+      fread(&aux_prox_rrn, sizeof(int), 1, f);
+
+      //Voltar para o topo pilha no cabecalho
+      fseek(f, 1 , SEEK_SET);
+
+      //Atualizando o topo da pilha
+      fwrite(&aux_prox_rrn, sizeof(int), 1, f);
+
+      //Ir para o registro certo novamente
+      fseek(f, rrn_topo_pilha * 87, SEEK_CUR);
+
+    }
+
+    int tam_nome_esc = strlen(nome_esc);
+    int tam_muni = strlen(muni);
+    int tam_prest = strlen(prest);
+
+    //Adicionar o novo registro
+    fwrite(&cod, sizeof(int), 1, f);
+    fwrite(data, sizeof(char), 10, f);
+    fwrite(uf, sizeof(char), 2, f);
+    fwrite(&tam_nome_esc, sizeof(int), 1, f);
+    fwrite(nome_esc, sizeof(char), tam_nome_esc, f);
+    fwrite(&tam_muni, sizeof(int), 1, f);
+    fwrite(muni, sizeof(char), tam_muni, f);
+    fwrite(&tam_prest, sizeof(int), 1, f);
+    fwrite(prest, sizeof(char), tam_prest, f);
+
+    printf("Registro inserido com sucesso.\n");
+
+    //Atualizando o status
+    status = 1;
+    //Voltando para atualizar o status
+    fseek(f, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, f);
+    fclose(f);
+
+}
+
+void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
+  int status = 0;
+
+  //Abrindo o arquivo
+  FILE *f = fopen("teste.bin", "r+b");
+  verifica_arquivo(f);
+
+  //Alterar o status
+  fwrite(&status, sizeof(char), 1, f);
+
+  //Pular topo da pilha
+  fseek(f, sizeof(int), SEEK_CUR);
+
+  //Buscar o RRN a ser atualizado
+  fseek(f, rrn * 87, SEEK_CUR);
+
+  //Pegando os tamanhos dos campos variaveis
+  int tam_nome_esc = strlen(nome_esc);
+  int tam_muni = strlen(muni);
+  int tam_prest = strlen(prest);
+
+  //Adicionar o novo registro
+  fwrite(&cod, sizeof(int), 1, f);
+  fwrite(data, sizeof(char), 10, f);
+  fwrite(uf, sizeof(char), 2, f);
+  fwrite(&tam_nome_esc, sizeof(int), 1, f);
+  fwrite(nome_esc, sizeof(char), tam_nome_esc, f);
+  fwrite(&tam_muni, sizeof(int), 1, f);
+  if(tam_muni == 0){
+
+  }
+  fwrite(muni, sizeof(char), tam_muni, f);
+  fwrite(&tam_prest, sizeof(int), 1, f);
+  fwrite(prest, sizeof(char), tam_prest, f);
+
+  printf("Registro alterado com sucesso.\n");
+
+  //Atualizando o status
+  status = 1;
+  //Voltando para atualizar o status
+  fseek(f, 0, SEEK_SET);
+  fwrite(&status, sizeof(char), 1, f);
+  fclose(f);
+
 }

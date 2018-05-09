@@ -8,10 +8,10 @@ enum options{
   BUSCAPARAM,
   BUSCARRN = 4,
   REMOCAO = 5,
-  INSERE,
-  ATUALIZA,
+  INSERE = 6,
+  ATUALIZA = 7,
   COMPACTA,
-  RECUPERAREMOVIDOS
+  RECUPERAREMOVIDOS = 9
 };
 
 int main(int argc, char *argv[]){
@@ -70,6 +70,35 @@ int main(int argc, char *argv[]){
     case(REMOCAO):{
         int rrn = atoi(argv[2]);
         remover_registro_rrn(rrn);
+        break;
+    }
+    case(RECUPERAREMOVIDOS):{
+        recupera_rrn();
+        break;
+    }
+    case(INSERE):{
+        int cod = atoi(argv[2]);
+        char* data = argv[3];
+        char* uf = argv[4];
+        char* nome_esc = argv[5];
+        char* muni = argv[6];
+        char* prest = argv[7];
+
+        inserir_registro(cod, data, uf, nome_esc, muni, prest);
+
+        break;
+    }
+    case(ATUALIZA):{
+        int rrn = atoi(argv[2]);
+        int cod = atoi(argv[3]);
+        char* data = argv[4];
+        char* uf = argv[5];
+        char* nome_esc = argv[6];
+        char* muni = argv[7];
+        char* prest = argv[8];
+
+        atualizar_registro(rrn, cod, data, uf, nome_esc, muni, prest);
+
         break;
     }
 
