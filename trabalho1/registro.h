@@ -41,6 +41,6 @@ void printa_arquivo();
 void recupera_rrn();
 void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
-void printa_arquivo_seletivo(char* campo, char* valor);
+void busca_rrn_parametro(char* campo, char* valor);
 
 #endif

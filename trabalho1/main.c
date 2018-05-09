@@ -10,7 +10,7 @@ enum options{
   REMOCAO = 5,
   INSERE = 6,
   ATUALIZA = 7,
-  COMPACTA,
+  COMPACTA = 8,
   RECUPERAREMOVIDOS = 9
 };
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
       break;
     }
     case(BUSCAPARAM):{
-      printa_arquivo_seletivo(argv[2],argv[3]);
+      busca_rrn_parametro(argv[2],argv[3]);
       break;
     }
     case(BUSCARRN):{
