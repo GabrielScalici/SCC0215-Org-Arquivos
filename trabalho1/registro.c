@@ -478,3 +478,49 @@ void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* 
     fclose(f);
 
 }
+
+void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
+  int status = 0;
+
+  //Abrindo o arquivo
+  FILE *f = fopen("teste.bin", "r+b");
+  verifica_arquivo(f);
+
+  //Alterar o status
+  fwrite(&status, sizeof(char), 1, f);
+
+  //Pular topo da pilha
+  fseek(f, sizeof(int), SEEK_CUR);
+
+  //Buscar o RRN a ser atualizado
+  fseek(f, rrn * 87, SEEK_CUR);
+
+  //Pegando os tamanhos dos campos variaveis
+  int tam_nome_esc = strlen(nome_esc);
+  int tam_muni = strlen(muni);
+  int tam_prest = strlen(prest);
+
+  //Adicionar o novo registro
+  fwrite(&cod, sizeof(int), 1, f);
+  fwrite(data, sizeof(char), 10, f);
+  fwrite(uf, sizeof(char), 2, f);
+  fwrite(&tam_nome_esc, sizeof(int), 1, f);
+  fwrite(nome_esc, sizeof(char), tam_nome_esc, f);
+  fwrite(&tam_muni, sizeof(int), 1, f);
+  if(tam_muni == 0){
+
+  }
+  fwrite(muni, sizeof(char), tam_muni, f);
+  fwrite(&tam_prest, sizeof(int), 1, f);
+  fwrite(prest, sizeof(char), tam_prest, f);
+
+  printf("Registro alterado com sucesso.\n");
+
+  //Atualizando o status
+  status = 1;
+  //Voltando para atualizar o status
+  fseek(f, 0, SEEK_SET);
+  fwrite(&status, sizeof(char), 1, f);
+  fclose(f);
+
+}
