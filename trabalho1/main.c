@@ -4,8 +4,8 @@
 
 enum options{
   LEITURA = 1,
-  RECUPERA,
-  BUSCAPARAM,
+  RECUPERA = 2,
+  BUSCAPARAM = 3,
   BUSCARRN = 4,
   REMOCAO = 5,
   INSERE = 6,
@@ -59,7 +59,11 @@ int main(int argc, char *argv[]){
       break;
     }
     case(RECUPERA):{
-      recuperar_arquivo();
+      printa_arquivo();
+      break;
+    }
+    case(BUSCAPARAM):{
+      printa_arquivo_seletivo(argv[2],argv[3]);
       break;
     }
     case(BUSCARRN):{
