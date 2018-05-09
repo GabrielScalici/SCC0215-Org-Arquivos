@@ -6,10 +6,17 @@
 #define TAM_REG 87
 //Definindo o delimitador de campo
 #define DEL_CAMPO 59
+//Definições para verificação de arquivo
+enum{
+    CARREGANDO,
+    RECUPERANDO
+};
+
 
 /*
  *  ESTRUTURAS
  */
+
  //Definindo o cabecalho
  typedef struct{
       char status;
@@ -33,7 +40,7 @@ typedef struct{
  *  FUNCOES
  */
 FILE* cria_arquivo();
-void verifica_arquivo(FILE *f);
+void verifica_arquivo(FILE *f, int func);
 Registro* recuperar_registros(FILE *f,int qtdRegs);
 void transfere_arquivo(Registro* reg, int qtdRegs);
 void busca_rrn(int RRN);

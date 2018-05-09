@@ -34,7 +34,7 @@ FILE* cria_arquivo(char *arquivo){
     Registro *reg;
 
     f = fopen(arquivo, "rb");       //Abre o arquivo em modo de leitura binária
-    verifica_arquivo(f);            //Verifica se o arquivo abriu corretamente
+    verifica_arquivo(f, CARREGANDO);            //Verifica se o arquivo abriu corretamente
 
     printf("Arquivo carregado.\n");
 
@@ -42,9 +42,10 @@ FILE* cria_arquivo(char *arquivo){
 }
 
 //Funcao auxiliar para verificar se o srquivo foi aberto corretamente
-void verifica_arquivo(FILE *f){
+void verifica_arquivo(FILE *f, int func){
     if(!f){
-        printf("Falha no carregamento do arquivo.\n");
+        if(func == 0)   printf("Falha no carregamento do arquivo.\n");
+        if(func == 1)   printf("Falha no processamento do arquivo.\n");
         exit(1);
     }
 }
@@ -137,7 +138,7 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
     int tamAtual;
     char c = '0';
     f = fopen("teste.bin", "wb");
-    verifica_arquivo(f);
+    verifica_arquivo(f, CARREGANDO);
 
     //Cria um cabecalho auxiliar
     Cabecalho cab;
@@ -187,7 +188,7 @@ void busca_rrn(int RRN){
     char status = '0';
     //Abrindo o arquivo e verificando sua condição
     FILE *f = fopen("teste.bin", "rb");
-    verifica_arquivo(f);
+    verifica_arquivo(f, RECUPERANDO);
 
     //Alterar o status
     fwrite(&status, sizeof(char), 1, f);
@@ -271,7 +272,7 @@ void remover_registro_rrn(int RRN){
 
     //Abrindo o arquivo
     FILE *f = fopen("teste.bin", "r+b");
-    verifica_arquivo(f);
+    verifica_arquivo(f, RECUPERANDO);
 
     //Alterar o status
     fwrite(&status, sizeof(char), 1, f);
@@ -337,7 +338,7 @@ void printa_arquivo(){
     //int aux;
 
     f = fopen("teste.bin", "r+b");  //Abre o arquivo
-    verifica_arquivo(f);            //Verifica o arquivo
+    verifica_arquivo(f, RECUPERANDO);            //Verifica o arquivo
 
     //Lê o cabeçalho
     fread(&cab.status, sizeof(char), 1, f);
@@ -411,7 +412,7 @@ void recupera_rrn(){
 
   //Abrindo o arquivo
   FILE *f = fopen("teste.bin", "r+b");
-  verifica_arquivo(f);
+  verifica_arquivo(f, RECUPERANDO);
 
   //Alterar o status
   fwrite(&status, sizeof(char), 1, f);
@@ -462,7 +463,7 @@ void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* 
 
   //Abrindo o arquivo
   FILE *f = fopen("teste.bin", "r+b");
-  verifica_arquivo(f);
+  verifica_arquivo(f, RECUPERANDO);
 
   //Alterar o status
   fwrite(&status, sizeof(char), 1, f);
@@ -530,7 +531,7 @@ void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_
 
   //Abrindo o arquivo
   FILE *f = fopen("teste.bin", "r+b");
-  verifica_arquivo(f);
+  verifica_arquivo(f, RECUPERANDO);
 
   //Alterar o status
   fwrite(&status, sizeof(char), 1, f);
@@ -609,7 +610,7 @@ void busca_rrn_parametro(char* campo, char* valor){
 
     f = fopen("teste.bin", "r+b");
 
-    verifica_arquivo(f);    //Verifica se carregou o arquivo
+    verifica_arquivo(f, RECUPERANDO);    //Verifica se carregou o arquivo
     printf("Arquivo aberto\n");
 
 	fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
