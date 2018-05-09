@@ -343,6 +343,18 @@ void printa_arquivo(){
     fread(&cab.status, sizeof(char), 1, f);
     fread(&cab.topoPilha, sizeof(int), 1, f);
 
+    if(cab.status == '0'){  //Significa que o arquivo de dados está inconsistente
+        printf("Falha no processamento do arquivo.\n");
+        exit(-1);
+    }
+
+    fseek(f, 0, SEEK_SET);                      //Volta pro início do arquivo
+    cab.status = '0';                           //Novo status do arquivo
+    fwrite(&cab.status, sizeof(char), 1, f);    //Escreve o novo status do arquivo
+
+    //Posição do primeiro registro
+    fseek(f, 5, SEEK_SET);      
+
     // printf("%c\t%d\n", cab.status, cab.topoPilha);
 
     while(!feof(f)){
@@ -386,6 +398,11 @@ void printa_arquivo(){
         i++;
         fseek(f, (TAM_REG * i) + 5, SEEK_SET);
     }
+
+    fseek(f, 0, SEEK_SET);
+    cab.status = '1';
+    fwrite(&cab.status, sizeof(char), 1, f);
+
     return;
 }
 
