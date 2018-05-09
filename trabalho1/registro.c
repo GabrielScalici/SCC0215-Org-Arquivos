@@ -345,7 +345,7 @@ void printa_arquivo(){
     fread(&cab.topoPilha, sizeof(int), 1, f);
 
     if(cab.status == '0'){  //Significa que o arquivo de dados está inconsistente
-        printf("Falha no processamento do arquivo.\n");
+        //printf("Falha no processamento do arquivo.\n");   //Coloca mesmo?
         exit(-1);
     }
 
