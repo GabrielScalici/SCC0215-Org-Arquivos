@@ -58,6 +58,8 @@ void busca_rrn_parametro(char* campo, char* valor);
  *  PARTE 2
  */
 
+ #define TAM_NO_INDICE 116;
+
  //Definindo o cabecalho do arquivo de arvore B
  typedef struct{
       char status;

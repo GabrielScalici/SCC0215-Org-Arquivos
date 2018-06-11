@@ -750,6 +750,7 @@ void criar_arvore_B(){
 
 void inserir_B(reg){
     FILE b*
+    int i, j;
 
     //Lendo o arquivo o arquivo da arvore B
     b = fopen("teste.bin", "w+b");
@@ -764,19 +765,25 @@ void inserir_B(reg){
 
     //Lendo a altura da arvore
     int altura_B;
-    fread(altura, sizeof(int), 1, b);
+    fread(altura_B, sizeof(int), 1, b);
 
     //Checar se a arvore esta vazia
     if(rrn_no_raiz == -1){
         //Adicionar no no raiz
     }else{
-        //Pega o valor do nó raiz
-        //Verifica os valores 
-        //Verificar se esta cheio
-            //Caso sim, split
-                //Atualiza os ponteiros e valores
-            //Caso nao, insere
-                //Atualiza os ponteiros e valores
+        //Vai para o indice indicado no no raiz
+        fseek(b, TAM_NO_INDICE*rrn_no_raiz, SEEK_CUR);
+
+        //Verifica o valor de n
+        int n_no
+        fread(n_no, sizeof(int), 1, b);
+
+        while(){}
+            for(j=0; j<n_no; j++){
+
+            }
+        }
+
 
     }
 
@@ -789,4 +796,9 @@ void inserir_B(reg){
     fwrite(&status, sizeof(char), 1, f);
 
     fclose(b);
+}
+
+//Funcao de split para a insercao na arvore B
+void split_B(){
+
 }
