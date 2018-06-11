@@ -354,7 +354,7 @@ void printa_arquivo(){
     fwrite(&cab.status, sizeof(char), 1, f);    //Escreve o novo status do arquivo
 
     //Posição do primeiro registro
-    fseek(f, 5, SEEK_SET);      
+    fseek(f, 5, SEEK_SET);
 
     // printf("%c\t%d\n", cab.status, cab.topoPilha);
 
@@ -710,4 +710,83 @@ void busca_rrn_parametro(char* campo, char* valor){
 	}
 
     fclose(f);  //Fecha o arquivo
+}
+
+
+FILE* criar_indice(char *arquivo){
+    FILE* b;
+
+    //Criando o arquivo de dados chamado de (teste.bin)
+    b = cria_arquivo(arquivo);
+
+    //Criando o cabecalho arvore B chamado (arvoreB.bin)
+    criar_arvore_B();
+
+    return b;
+
+}
+
+//Funcao para criar o cabealho no arquivo de arvore B
+void criar_arvore_B(){
+    FILE* f;
+    int tamAtual;
+    char c = '0';
+    f = fopen("arvoreB.bin", "wb");
+    verifica_arquivo(f, CARREGANDO);
+
+
+    //Cria um cabecalho auxiliar
+    Cabecalho_B cab;
+    cab.status = '1';           //consistente
+    cab.noRaiz = -1;            //Arvore vazia por enquanto
+    cab.altura = 0;
+
+    //Escreve o cabecalho no arquivo
+    fwrite(&cab.status, sizeof(char), 1, f);
+    fwrite(&cab.noRaiz,sizeof(int),1,f);
+    fwrite(&cab.altura,sizeof(int),1,f);
+
+}
+
+void inserir_B(reg){
+    FILE b*
+
+    //Lendo o arquivo o arquivo da arvore B
+    b = fopen("teste.bin", "w+b");
+
+    //Alterar o status
+    char status;
+    fwrite(&status, sizeof(char), 0, f);
+
+    //Lendo o no raiz
+    int rrn_no_raiz;
+    fread(rrn_no_raiz, sizeof(int), 1, b);
+
+    //Lendo a altura da arvore
+    int altura_B;
+    fread(altura, sizeof(int), 1, b);
+
+    //Checar se a arvore esta vazia
+    if(rrn_no_raiz == -1){
+        //Adicionar no no raiz
+    }else{
+        //Pega o valor do nó raiz
+        //Verifica os valores 
+        //Verificar se esta cheio
+            //Caso sim, split
+                //Atualiza os ponteiros e valores
+            //Caso nao, insere
+                //Atualiza os ponteiros e valores
+
+    }
+
+
+
+
+
+    //Atualizando o status
+    fseek(b,0,SEEK_SET);
+    fwrite(&status, sizeof(char), 1, f);
+
+    fclose(b);
 }

@@ -8,7 +8,7 @@ registro.o: registro.c registro.h
 	gcc -c registro.c -o registro.o
 
 run:main
-	./main 3 'nomeEscola' 'EE CANDIDA ALVARENGA MENDONCA'
+	./main 10 'turmaB-dadosPBLE.csv'
 
 clean:
 	rm -rf *o main

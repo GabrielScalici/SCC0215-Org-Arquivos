@@ -11,7 +11,9 @@ enum{
     CARREGANDO,
     RECUPERANDO
 };
-
+/*
+ *  PARTE 1
+ */
 
 /*
  *  ESTRUTURAS
@@ -50,5 +52,44 @@ void recupera_rrn();
 void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void busca_rrn_parametro(char* campo, char* valor);
+
+
+/*
+ *  PARTE 2
+ */
+
+ //Definindo o cabecalho do arquivo de arvore B
+ typedef struct{
+      char status;
+      int noRaiz;
+      int altura;
+ } Cabecalho_B;
+
+ /*
+  * N  = numero de registros na sub-arvore
+  * P  = Ponteiro para a sub arvore
+  * C  = Chave de busca
+  * PR = Referencia para o arquivo de dados
+  * Minimo de registros = 5
+  * Maximo de registros = 10
+ */
+ //Definindo os nos da arvore B
+ typedef struct{
+     int n;
+     int p[10];
+     int c[9];
+     int pr[9];
+ } arvoreB;
+
+ /*
+  *  FUNCOES
+  */
+
+
+FILE* criar_indice(char *arquivo);
+void criar_arvore_B();
+
+
+
 
 #endif
