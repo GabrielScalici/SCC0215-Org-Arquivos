@@ -740,38 +740,43 @@ void criar_arvore_B(){
     cab.status = '1';           //consistente
     cab.noRaiz = -1;            //Arvore vazia por enquanto
     cab.altura = 0;
-    cab.lastRRN = -1;
+    cab.ultimoRRN = -1;
 
     //Escreve o cabecalho no arquivo
     fwrite(&cab.status, sizeof(char), 1, f);
     fwrite(&cab.noRaiz,sizeof(int),1,f);
     fwrite(&cab.altura,sizeof(int),1,f);
-    fwrite(&cab.lastRRN,sizeof(int),1,f);
+    fwrite(&cab.ultimoRRN,sizeof(int),1,f);
 
 }
 
-void inserir_B(reg){
-    FILE b*
+void inserir_B(Registro reg){
+    FILE *b;
     int i, j;
+    Cabecalho_B cab;
 
     //Lendo o arquivo o arquivo da arvore B
     b = fopen("teste.bin", "w+b");
 
     //Alterar o status
     char status;
-    fwrite(&status, sizeof(char), 1, f);
+    fwrite(&status, sizeof(char), 1, b);
+    cab.status = status;
 
     //Lendo o no raiz
     int rrn_no_raiz;
-    fread(rrn_no_raiz, sizeof(int), 1, b);
+    fread(&rrn_no_raiz, sizeof(int), 1, b);
+    cab.noRaiz = rrn_no_raiz;
 
     //Lendo a altura da arvore
     int altura_B;
-    fread(altura_B, sizeof(int), 1, b);
+    fread(&altura_B, sizeof(int), 1, b);
+    cab.altura = altura_B;
 
     //Lendo o ultimo RRN da arvore
     int lastRRN;
-    fread(lastRRN, sizeof(int), 1, b);
+    fread(&lastRRN, sizeof(int), 1, b);
+    cab.ultimoRRN = lastRRN;
 
     //Checar se a arvore esta vazia
     if(rrn_no_raiz == -1){
@@ -781,8 +786,8 @@ void inserir_B(reg){
         fseek(b, TAM_NO_INDICE*rrn_no_raiz, SEEK_CUR);
 
         //Verifica o valor de n
-        int n_no
-        fread(n_no, sizeof(int), 1, b);
+        int n_no;
+        fread(&n_no, sizeof(int), 1, b);
 
         //Checa se o no está cheio
         if(n_no == 9){
@@ -800,9 +805,10 @@ void inserir_B(reg){
 
         	//aloca o novo nó
         	//vai até o ultimo RRN
-        	fseek(b, ultimoRRN*sizeof(TAM_NO_INDICE), SEEK_CUR);
-        	//Escreve o n do nó
-        	fwrite(0, sizeof(int), 1, b);
+        	fseek(b, cab.ultimoRRN*sizeof(TAM_NO_INDICE), SEEK_CUR);
+            //Escreve o n do nó
+            int aux_zero = 0;
+        	fwrite(&aux_zero, sizeof(int), 1, b);
         	//Atualiza p1 como a antiga raiz
         	fwrite(&rrn_no_raiz, sizeof(int), 1, b);
         	//Faz o split da antiga raiz
@@ -936,7 +942,7 @@ void inserir_B(reg){
 
     //Atualizando o status
     fseek(b,0,SEEK_SET);
-    fwrite(&status, sizeof(char), 1, f);
+    fwrite(&status, sizeof(char), 1, b);
 
     fclose(b);
 }
