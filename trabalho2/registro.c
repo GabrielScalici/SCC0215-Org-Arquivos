@@ -787,6 +787,46 @@ void inserir_B(reg){
 
     }
 
+    /*  Segunda:
+
+    Estrutura índice:
+    n | p1 c1 pr1 p2 c2 pr2 p3 ... p9 c9 pr9 p10 |
+    onde:
+        n = qtd de chaves
+        pi = rrn do nó filho
+        ci = chave (codINEP)
+        pri = rrn do registro no arquivo de dados
+
+    convenções:
+        pi == -1 --> sem filhos
+        se p1 == -1 --> nó folha
+
+    sendo x a chave que queremos adicionar
+        p1 --> x < c1
+        p2 --> c1 < x < c2
+        ...
+        p9 --> c8 < x < c9
+        p10 --> x > c9
+    
+    Pseudocódigo iterativo de segunda:
+        while(p1 != -1){    //verifica se o nó é folha
+            //modo busca
+            for(i = 0;i < n;i++){
+                aux = pi    //armazena o rrn do nó filho
+                if(x < ci)  segue a arvore pelo aux (pi)
+                else        continua a busca
+            }
+            //percorreu o índice inteiro
+            segue a arvore pelo pn (último filho)
+        }
+        //modo inserção
+        verifica necessidade de split
+        for(i = 0;i < n;i++){
+            if(x < ci)  insere na posicao i e manda tudo pra frente 
+            else        continua a busca
+        }
+        insere na primeira posicao vazia (maior que tudo)
+    */
 
 
 
