@@ -826,6 +826,34 @@ void inserir_B(reg){
             else        continua a busca
         }
         insere na primeira posicao vazia (maior que tudo)
+
+    Pseudocódigo recursivo de segunda:
+        func(chave x, rrn_no){
+            abre o arquivo e armazena o nó (rrn_no) na memória
+            fecha o arquivo (?)
+
+            if(p1 == -1){    //condição de parada = NÓ FOLHA
+                //modo insercao
+                verifica necessidade de split
+                for(i = 0;i < n;i++){
+                    if(x < ci)  insere na posicao i e manda tudo pra frente 
+                    else        continua a busca
+                }
+                insere na primeira posicao vazia (maior que tudo)
+                return;
+            }
+            //modo busca
+            for(i = 0;i < n;i++){
+                aux = pi    //armazena o rrn do nó filho
+                if(x < ci)  func(x, aux)            
+                else        continua a busca
+            }
+            //percorreu o indice inteiro
+            func(x, pn) //ultimo filho
+            verificar novamente se precisa de split (?)
+                '-> na vdd durante o split() já precisa verificar isso
+            return;
+        }
     */
 
 
