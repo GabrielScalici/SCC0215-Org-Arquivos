@@ -791,7 +791,7 @@ void inserir_B(Registro reg){
 
         //Checa se o no está cheio
         if(n_no == 9){
-        	//atualiza o cabeçalho
+        	//atualiza o cabeçalho pulando o char
         	fseek(b, 1, SEEK_SET);
         	//atualiza o noRaiz;
         	cab.noRaiz = cab.ultimoRRN + 1;
@@ -823,78 +823,7 @@ void inserir_B(Registro reg){
 
 
     }
-
-    /*  Segunda:
-
-    Estrutura índice:
-    n | p1 c1 pr1 p2 c2 pr2 p3 ... p9 c9 pr9 p10 |
-    onde:
-        n = qtd de chaves
-        pi = rrn do nó filho
-        ci = chave (codINEP)
-        pri = rrn do registro no arquivo de dados
-
-    convenções:
-        pi == -1 --> sem filhos
-        se p1 == -1 --> nó folha
-
-    sendo x a chave que queremos adicionar
-        p1 --> x < c1
-        p2 --> c1 < x < c2
-        ...
-        p9 --> c8 < x < c9
-        p10 --> x > c9
-
-    
-    Pseudocódigo iterativo de segunda:
-        while(p1 != -1){    //verifica se o nó é folha
-            //modo busca
-            for(i = 0;i < n;i++){
-                aux = pi    //armazena o rrn do nó filho
-                if(x < ci)  segue a arvore pelo aux (pi)
-                else        continua a busca
-            }
-            //percorreu o índice inteiro
-            segue a arvore pelo pn (último filho)
-        }
-        //modo inserção
-        verifica necessidade de split
-        for(i = 0;i < n;i++){
-            if(x < ci)  insere na posicao i e manda tudo pra frente 
-            else        continua a busca
-        }
-        insere na primeira posicao vazia (maior que tudo)
-
-
-    Pseudocódigo recursivo de segunda:
-        func(chave x, rrn_no){
-            abre o arquivo e armazena o nó (rrn_no) na memória
-            fecha o arquivo (?)
-
-            if(p1 == -1){    //condição de parada = NÓ FOLHA
-                //modo insercao
-                verifica necessidade de split
-                for(i = 0;i < n;i++){
-                    if(x < ci)  insere na posicao i e manda tudo pra frente 
-                    else        continua a busca
-                }
-                insere na primeira posicao vazia (maior que tudo)
-                return;
-            }
-            //modo busca
-            for(i = 0;i < n;i++){
-                aux = pi    //armazena o rrn do nó filho
-                if(x < ci)  func(x, aux)            
-                else        continua a busca
-            }
-            //percorreu o indice inteiro
-            func(x, pn) //ultimo filho
-            verificar novamente se precisa de split (?)
-                '-> na vdd durante o split() já precisa verificar isso
-            return;
-        }
-
-
+/*
         Pseudocódigo Cormen:
 
         B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
@@ -937,14 +866,34 @@ void inserir_B(Registro reg){
         }
     */
 
-
-
-
     //Atualizando o status
     fseek(b,0,SEEK_SET);
     fwrite(&status, sizeof(char), 1, b);
 
     fclose(b);
+}
+
+void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
+    int qtd;
+    arvoreB node;
+    int i;
+
+    //move o ponteiro para o nó desejado
+    fseek(b, sizeof(Cabecalho_B), SEEK_SET);
+    fseek(b, rrn_no*sizeof(TAM_NO_INDICE), SEEK_CUR);
+
+    //lê a quantidade de chaves no nó
+    fread(&qtd, 1, sizeof(int), b);
+
+    //lê todas as chaves/ponteiros do nó
+    for(i = 0;i < qtd;i++){
+        fread(&node.p[i], 1, sizeof(int), b);
+        fread(&node.c[i], 1, sizeof(int), b);
+        fread(&node.pr[i], 1, sizeof(int), b);
+    }
+    //lê o último ponteiro
+    fread(&node.p[i], 1, sizeof(int), b);
+
 }
 
 //Funcao de split para a insercao na arvore B
