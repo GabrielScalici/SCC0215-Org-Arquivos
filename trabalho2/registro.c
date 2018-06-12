@@ -4,7 +4,7 @@
  *  NOMES:                      NUMERO USP
  *  GABRIEL SCALICI             9292970
  *  RODRIGO NOVENTA JR          9791243
- *
+ *	EDUARDO ALVES BARATELA      10295270
  *
  */
 
@@ -740,11 +740,13 @@ void criar_arvore_B(){
     cab.status = '1';           //consistente
     cab.noRaiz = -1;            //Arvore vazia por enquanto
     cab.altura = 0;
+    cab.lastRRN = -1;
 
     //Escreve o cabecalho no arquivo
     fwrite(&cab.status, sizeof(char), 1, f);
     fwrite(&cab.noRaiz,sizeof(int),1,f);
     fwrite(&cab.altura,sizeof(int),1,f);
+    fwrite(&cab.lastRRN,sizeof(int),1,f);
 
 }
 
@@ -757,7 +759,7 @@ void inserir_B(reg){
 
     //Alterar o status
     char status;
-    fwrite(&status, sizeof(char), 0, f);
+    fwrite(&status, sizeof(char), 1, f);
 
     //Lendo o no raiz
     int rrn_no_raiz;
@@ -766,6 +768,10 @@ void inserir_B(reg){
     //Lendo a altura da arvore
     int altura_B;
     fread(altura_B, sizeof(int), 1, b);
+
+    //Lendo o ultimo RRN da arvore
+    int lastRRN;
+    fread(lastRRN, sizeof(int), 1, b);
 
     //Checar se a arvore esta vazia
     if(rrn_no_raiz == -1){
@@ -778,10 +784,35 @@ void inserir_B(reg){
         int n_no
         fread(n_no, sizeof(int), 1, b);
 
-        while(){}
-            for(j=0; j<n_no; j++){
+        //Checa se o no está cheio
+        if(n_no == 9){
+        	//atualiza o cabeçalho
+        	fseek(b, 1, SEEK_SET);
+        	//atualiza o noRaiz;
+        	cab.noRaiz = cab.ultimoRRN + 1;
+        	fwrite(&cab.noRaiz, sizeof(int), 1, b);
+        	//atualiza a altura da arvore
+        	cab.altura++;
+        	fwrite(&cab.altura, sizeof(int), 1, b);
+        	//atualiza o ultimoRRN
+        	cab.ultimoRRN++;
+        	fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
 
-            }
+        	//aloca o novo nó
+        	//vai até o ultimo RRN
+        	fseek(b, ultimoRRN*sizeof(TAM_NO_INDICE), SEEK_CUR);
+        	//Escreve o n do nó
+        	fwrite(0, sizeof(int), 1, b);
+        	//Atualiza p1 como a antiga raiz
+        	fwrite(&rrn_no_raiz, sizeof(int), 1, b);
+        	//Faz o split da antiga raiz
+        	//split_B();
+        	//Insere o novo item no nó que foi splitado
+        	//insere_naoCheio();
+        }
+        else{
+        	//Insere na raiz
+        	//insere_naoCheio();
         }
 
 
@@ -896,7 +927,7 @@ void inserir_B(reg){
         }
 
         SPLIT(){
-		
+			
         }
     */
 

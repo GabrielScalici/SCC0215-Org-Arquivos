@@ -65,6 +65,7 @@ void busca_rrn_parametro(char* campo, char* valor);
       char status;
       int noRaiz;
       int altura;
+      int ultimoRRN;
  } Cabecalho_B;
 
  /*
