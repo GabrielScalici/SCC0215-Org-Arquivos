@@ -845,7 +845,9 @@ void inserir_B(Registro reg){
         }
 
         B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-			i = n[x]
+            i = n[x]
+            
+
 			if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
 				while(i>=0 && k<ci[x]){
 					ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
@@ -879,6 +881,13 @@ void inserir_B(Registro reg){
     fclose(b);
 }
 
+void ordena_no_B(arvoreB *node, Registro reg, int qtd){
+    while(qtd >= 0 && reg.codINEP < node->c[qtd]){
+        
+    }
+}
+
+
 void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
     int qtd;
     arvoreB node;
@@ -900,6 +909,11 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
     //lê o último ponteiro
     fread(&node.p[i], 1, sizeof(int), b);
 
+    //verifica o primeiro ponteiro
+    if(node.p[0] == -1){    //-1 significa que é nó folha
+        qtd--;
+        ordena_no_B(&node, reg, qtd);
+    }
 }
 
 //Funcao de split para a insercao na arvore B
