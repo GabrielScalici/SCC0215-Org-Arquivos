@@ -758,6 +758,7 @@ void inserir_B(Registro reg){
     //Lendo o arquivo o arquivo da arvore B
     b = fopen("teste.bin", "w+b");
 
+    //TUDO CABEÇALHO
     //Alterar o status
     char status;
     fwrite(&status, sizeof(char), 1, b);
@@ -805,12 +806,17 @@ void inserir_B(Registro reg){
 
         	//aloca o novo nó
         	//vai até o ultimo RRN
-        	fseek(b, cab.ultimoRRN*sizeof(TAM_NO_INDICE), SEEK_CUR);
+        	fseek(b, cab.ultimoRRN*TAM_NO_INDICE, SEEK_CUR);
             //Escreve o n do nó
             int aux_zero = 0;
+            int aux_m1 = -1;
         	fwrite(&aux_zero, sizeof(int), 1, b);
-        	//Atualiza p1 como a antiga raiz
-        	fwrite(&rrn_no_raiz, sizeof(int), 1, b);
+        	//Atualiza p[0] como a antiga raiz
+            fwrite(&rrn_no_raiz, sizeof(int), 1, b);
+            for(i = 1;i < n_no;i++){
+                fseek(b, 8, SEEK_CUR);
+                fwrite(&aux_m1, 1, sizeof(int), b);
+            }
         	//Faz o split da antiga raiz
         	//split_B();
         	//Insere o novo item no nó que foi splitado
@@ -880,7 +886,7 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
 
     //move o ponteiro para o nó desejado
     fseek(b, sizeof(Cabecalho_B), SEEK_SET);
-    fseek(b, rrn_no*sizeof(TAM_NO_INDICE), SEEK_CUR);
+    fseek(b, rrn_no*TAM_NO_INDICE, SEEK_CUR);
 
     //lê a quantidade de chaves no nó
     fread(&qtd, 1, sizeof(int), b);
