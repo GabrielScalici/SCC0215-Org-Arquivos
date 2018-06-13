@@ -883,10 +883,12 @@ void inserir_B(Registro reg){
 
 void ordena_no_B(arvoreB *node, Registro reg, int qtd){
     while(qtd >= 0 && reg.codINEP < node->c[qtd]){
-        
+        node->p[qtd+1] = node->p[qtd];
+        node->c[qtd+1] = node->c[qtd];
+        node->pr[qtd+1] = node->pr[qtd];
+        qtd--;
     }
 }
-
 
 void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
     int qtd;
