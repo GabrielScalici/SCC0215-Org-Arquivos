@@ -846,8 +846,6 @@ void inserir_B(Registro reg){
 
         B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
             i = n[x]
-            
-
 			if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
 				while(i>=0 && k<ci[x]){
 					ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
@@ -881,19 +879,23 @@ void inserir_B(Registro reg){
     fclose(b);
 }
 
-void ordena_no_B(arvoreB *node, Registro reg, int qtd){
-    while(qtd >= 0 && reg.codINEP < node->c[qtd]){
-        node->p[qtd+1] = node->p[qtd];
-        node->c[qtd+1] = node->c[qtd];
-        node->pr[qtd+1] = node->pr[qtd];
-        qtd--;
+int ordena_no_B(arvoreB *node, Registro reg, int qtd){
+	int i = 0;
+	
+    while(i < qtd && reg.codINEP > node->c[i]){
+        node->p[i+1] = node->p[i];
+        node->c[i+1] = node->c[i];
+        node->pr[i+1] = node->pr[i];
+        i++;
     }
+    
+    return i;
 }
 
 void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
     int qtd;
     arvoreB node;
-    int i;
+    int i, pos;
 
     //move o ponteiro para o nó desejado
     fseek(b, sizeof(Cabecalho_B), SEEK_SET);
@@ -913,9 +915,26 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
 
     //verifica o primeiro ponteiro
     if(node.p[0] == -1){    //-1 significa que é nó folha
-        qtd--;
-        ordena_no_B(&node, reg, qtd);
-    }
+        pos = ordena_no_B(&node, reg, qtd);
+        node.c[pos] = reg.codINEP;
+        //node.p[pos] = RRN DO REGISTRO (A GENTE NÃO PASSA ISSO)
+        qtd++;
+        //TODO Escrever no arquivo
+    }else{					//não é nó folha
+		//procura o ponteiro que irá "descer"
+		while(qtd >= 0 && reg.codINEP < node.c[qtd])	qtd--;
+		qtd++;
+		//posiciona o leitor no nó correto
+		fseek(b, sizeof(Cabecalho_B), SEEK_SET);
+		fseek(b,  node.p[qtd]*TAM_NO_INDICE, SEEK_CUR);
+		//armazena o n do nó
+		fread(&qtd, 1, sizeof(int), b);
+		//verifica se o nó está cheio
+		if(qtd == 9){
+			//split_B();
+			//Aqui eu não sei
+		}
+	}
 }
 
 //Funcao de split para a insercao na arvore B
