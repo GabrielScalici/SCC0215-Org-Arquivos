@@ -962,7 +962,7 @@ void split_B(){
             pj+1[pai] = pj[pai]
           }
           //atençao que é i e nao j aqui embaixo
-          pi+1[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
+          pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
 
           for(j = n[pai]-1; j--; j<i)
             cj+1[pai] = cj[pai]
