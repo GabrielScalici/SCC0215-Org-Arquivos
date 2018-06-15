@@ -980,3 +980,39 @@ void split_B(){
   */
 
 }
+
+void pesquisa_B(){
+  /*
+    PESQUISA(no x, int k){
+      int i = 0
+
+      FSEEK PULANDO CABECALHO
+      FSEEK x*TAMANHO_INDICE
+
+      fread(n[x])
+      fread[p[0]]
+      fread(c[0])
+      fread(pr[0])
+      while(i<n[x] && k > c[i]){
+        i++
+        fread[p[i]]
+        fread(c[i])
+        fread(pr[i])
+      }
+      fread[p[i]]
+
+      if(i<n[x] && k == c[i]){
+        busca(c[i] ou pr[i]) //busca essa chave no arquivo de dados
+        return
+      }
+
+      if(p[0] == -1){
+        printf(nao encontrado)
+        return
+      }
+      else PESQUISA(p[i], k);
+
+
+    }
+  */
+}
