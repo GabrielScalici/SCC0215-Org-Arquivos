@@ -750,7 +750,7 @@ void criar_arvore_B(){
 
 }
 
-void inserir_B(Registro reg){
+void inserir_B(Registro reg, int RRN_reg){
     FILE *b;
     int i, j;
     Cabecalho_B cab;
@@ -833,42 +833,15 @@ void inserir_B(Registro reg){
         Pseudocódigo Cormen:
 
         B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
-			if(n[raiz]==9){
-				aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
-				cab.raiz = novaRaiz	//atualiza o cabeçalho
-				n[novRaiz] = 0
-				p1[novaRaiz] = raiz(antiga)
-				SPLIT(novaRaiz, 5, raiz(antiga))
-				B-TREE-INSERT-NONFULL(raiz, k) 
-			}
-			else B-TREE-INSERT-NONFULL(raiz, k)
-        }
-
-        B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-            i = n[x]
-			if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
-				while(i>=0 && k<ci[x]){
-					ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
-					i--
-				}
-				ci+1[x] = k
-				n[x]++
-			}
-			else{
-				while(i>=0 && k<ci[x])
-					i--
-				i++
-				FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
-				if(n[pi[x]] == 9){
-					SPLIT(x, i, pi[x])
-					if(k > ci[x]) i++ (?)
-				}
-				B-TREE-INSERT-NONFULL(pi[x], k)	//recursao até chegar em um nó folha
-			}
-        }
-
-        SPLIT(){
-			
+    			if(n[raiz]==9){
+    				aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
+    				cab.raiz = novaRaiz	//atualiza o cabeçalho
+    				n[novRaiz] = 0
+    				p1[novaRaiz] = raiz(antiga)
+    				SPLIT(novaRaiz, 5, raiz(antiga))
+    				B-TREE-INSERT-NONFULL(raiz, k) 
+    			}
+    			else B-TREE-INSERT-NONFULL(raiz, k)
         }
     */
 
@@ -880,9 +853,9 @@ void inserir_B(Registro reg){
 }
 
 int ordena_no_B(arvoreB *node, Registro reg, int qtd){
-	int i = 0;
-	
-    while(i < qtd && reg.codINEP > node->c[i]){
+	  int i = qtd;
+
+    while(i >= 0 && reg.codINEP < node->c[i]){
         node->p[i+1] = node->p[i];
         node->c[i+1] = node->c[i];
         node->pr[i+1] = node->pr[i];
@@ -892,7 +865,7 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
     return i;
 }
 
-void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
+void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg, int RRN_reg){
     int qtd;
     arvoreB node;
     int i, pos;
@@ -917,9 +890,11 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
     if(node.p[0] == -1){    //-1 significa que é nó folha
         pos = ordena_no_B(&node, reg, qtd);
         node.c[pos] = reg.codINEP;
-        //node.p[pos] = RRN DO REGISTRO (A GENTE NÃO PASSA ISSO)
+        node.pr[pos] = RRN_reg;
         qtd++;
+
         //TODO Escrever no arquivo
+
     }else{					//não é nó folha
 		//procura o ponteiro que irá "descer"
 		while(qtd >= 0 && reg.codINEP < node.c[qtd])	qtd--;
@@ -930,14 +905,78 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg){
 		//armazena o n do nó
 		fread(&qtd, 1, sizeof(int), b);
 		//verifica se o nó está cheio
-		if(qtd == 9){
+		if(qtd == 9){ //talvez seja 8
 			//split_B();
-			//Aqui eu não sei
+			//if(reg.codINEP > node.c[qtd]) qtd++; //nao sei se precisa
 		}
+
+    //recursao
+    insere_naoCheio_B(b, node.p[qtd], reg, RRN_reg);
 	}
+
+  /*
+  B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
+          i = n[x]
+          if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
+            while(i>=0 && k<ci[x]){
+              ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
+              i--
+            }
+            ci+1[x] = k
+            n[x]++
+          }
+          else{
+            while(i>=0 && k<ci[x])
+              i--
+            i++
+            FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
+            if(n[pi[x]] == 9){
+              SPLIT(x, i+1, pi[x])
+              if(k > ci[x]) i++ (?)
+            }
+            B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
+          }
+        }
+  */
 }
 
 //Funcao de split para a insercao na arvore B
 void split_B(){
+  /*
+  SPLIT(no pai, i, no filhoCheio){
+         aloca novoNo //aloca no ultimoRRN+1
+          n[novoNo] = 4
+          
+          for(j = 0; j++; j<4){}
+              cj[novoNo] = cj+5[filhoCheio]
+              prj[novoNo] = prj+5[filhoCheio]
+          }
+           
+          if(p0[filhoCheio] != -1){ //checa se nao é no folha
+            for(j=0; j++; j<5)
+              pj[novoNo] = pj+5[filhoCheio]
+          }
+          n[filhoCheio] = 4
+
+          for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
+            pj+1[pai] = pj[pai]
+          }
+          //atençao que é i e nao j aqui embaixo
+          pi+1[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
+
+          for(j = n[pai]-1; j--; j<i)
+            cj+1[pai] = cj[pai]
+            prj+1[pai] = prj[pai]
+          }
+          ci-1[pai] = c4[filhoCheio]
+          pri-1[pai] = pr4[filhoCheio]
+
+          n[pai]++
+
+          ESCREVE(novoNo)
+          ESCREVE(pai)
+          ESCREVE(filhoCheio)
+        }
+  */
 
 }
