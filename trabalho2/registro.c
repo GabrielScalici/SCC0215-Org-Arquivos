@@ -712,27 +712,24 @@ void busca_rrn_parametro(char* campo, char* valor){
 }
 
 
-FILE* criar_indice(char *arquivo, Registro *reg){
+FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
 
     //Criando o arquivo de dados chamado de (teste.bin)
-    b = cria_arquivo(arquivo);
+    b = fopen("arvoreB.bin.bin", "wb");
+    verifica_arquivo(b, CARREGANDO);
 
     //Criando o cabecalho arvore B chamado (arvoreB.bin)
-    criar_arvore_B(reg);
+    criar_arvore_B(reg, qtdRegs);
 
     return b;
-
 }
 
 //Funcao para criar o cabealho no arquivo de arvore B
-void criar_arvore_B(Registro *reg){
+void criar_arvore_B(Registro *reg, int qtdRegs){
     FILE* b;
     int tamAtual;
-    char c = '0';
-    b = fopen("arvoreB.bin", "wb");
-    verifica_arquivo(b, CARREGANDO);
-
+    b = fopen("arvoreB.bin", "w+b");
 
     //Cria um cabecalho auxiliar
     Cabecalho_B cab;
@@ -742,13 +739,25 @@ void criar_arvore_B(Registro *reg){
     cab.ultimoRRN = -1;
 
     //Escreve o cabecalho no arquivo
+    fseek(b, 0, SEEK_SET);
     fwrite(&cab.status, sizeof(char), 1, b);
     fwrite(&cab.noRaiz,sizeof(int),1,b);
     fwrite(&cab.altura,sizeof(int),1,b);
     fwrite(&cab.ultimoRRN,sizeof(int),1,b);
+    printf("cab.status %c\n", cab.status);
+    printf("cab.noRaiz %d\n", cab.noRaiz);
+    printf("cab.altura %d\n", cab.altura);
+    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
 
+    fclose(b);
 
-    inserir_B(reg[0], 0);
+    //insere todos os registros do arquivo de dados no arquivo de indices
+    for(int i = 0; i < 8; i++){
+      printf("%d\n", i);
+      inserir_B(reg[i], i);
+    }
+    
+    
 }
 
 void inserir_B(Registro reg, int RRN_reg){
@@ -758,27 +767,31 @@ void inserir_B(Registro reg, int RRN_reg){
     arvoreB node;
 
     //Lendo o arquivo o arquivo da arvore B
-    b = fopen("arvoreB.bin", "w+b");
-
+    b = fopen("arvoreB.bin", "r+b");
+    fseek(b, 0, SEEK_SET);
     //TUDO CABEÇALHO
     //Alterar o status
     char status = '1';
-    fwrite(&status, sizeof(char), 1, b);
+    fread(&status, sizeof(char), 1, b);
+    printf("status %c\n", status);
     cab.status = status;
 
     //Lendo o no raiz
     int rrn_no_raiz;
     fread(&rrn_no_raiz, sizeof(int), 1, b);
+    printf("rrn_no_raiz %d\n", rrn_no_raiz);
     cab.noRaiz = rrn_no_raiz;
 
     //Lendo a altura da arvore
     int altura_B;
     fread(&altura_B, sizeof(int), 1, b);
+    printf("altura_B %d\n", altura_B);
     cab.altura = altura_B;
 
     //Lendo o ultimo RRN da arvore
     int lastRRN;
     fread(&lastRRN, sizeof(int), 1, b);
+    printf("lastRRN %d\n", lastRRN);
     cab.ultimoRRN = lastRRN;
 
     //Checar se a arvore esta vazia
@@ -819,6 +832,7 @@ void inserir_B(Registro reg, int RRN_reg){
         //Verifica o valor de n
         int n_no;
         fread(&n_no, sizeof(int), 1, b);
+        printf("n_no = %d\n", n_no);
 
         //Checa se o no está cheio
         if(n_no == 9){
@@ -854,7 +868,7 @@ void inserir_B(Registro reg, int RRN_reg){
         }
         else{
         	//Insere na raiz
-        	//insere_naoCheio();
+        	insere_naoCheio_B(cab.noRaiz, reg, RRN_reg);
         }
 
 
@@ -887,26 +901,30 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
 	  int i = qtd;
 
     while(i >= 0 && reg.codINEP < node->c[i]){
-        node->p[i+1] = node->p[i];
-        node->c[i+1] = node->c[i];
-        node->pr[i+1] = node->pr[i];
-        i++;
+        node->p[i] = node->p[i-1];
+        node->c[i] = node->c[i-1];
+        node->pr[i] = node->pr[i-1];
+        i--;
     }
     
     return i;
 }
 
-void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg, int RRN_reg){
+void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
+    FILE *b;
     int qtd;
     arvoreB node;
     int i, pos;
 
+    b = fopen("arvoreB.bin", "r+b");
     //move o ponteiro para o nó desejado
     fseek(b, sizeof(Cabecalho_B), SEEK_SET);
     fseek(b, rrn_no*TAM_NO_INDICE, SEEK_CUR);
 
     //lê a quantidade de chaves no nó
-    fread(&qtd, 1, sizeof(int), b);
+    fread(&node.n, 1, sizeof(int), b);
+    printf("node.n = %d\n", node.n);
+    qtd = node.n;
 
     //lê todas as chaves/ponteiros do nó
     for(i = 0;i < qtd;i++){
@@ -922,9 +940,17 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg, int RRN_reg){
         pos = ordena_no_B(&node, reg, qtd);
         node.c[pos] = reg.codINEP;
         node.pr[pos] = RRN_reg;
-        qtd++;
+        node.n++;
 
-        //TODO Escrever no arquivo
+        //Retorna ao inicio do nó
+        fseek(b, -TAM_NO_INDICE, SEEK_CUR);
+        //Reescreve o nó atualizado no arquivo
+        fwrite(&node.n, sizeof(int), 1, b);
+        for(i=pos; i<node.n; i++){
+          fseek(b, sizeof(int), SEEK_CUR);
+          fwrite(&node.c[i], sizeof(int), 1, b);
+          fwrite(&node.pr[i], sizeof(int), 1, b);
+        }
 
     }else{					//não é nó folha
 		//procura o ponteiro que irá "descer"
@@ -942,7 +968,7 @@ void insere_naoCheio_B(FILE *b, int rrn_no, Registro reg, int RRN_reg){
 		}
 
     //recursao
-    insere_naoCheio_B(b, node.p[qtd], reg, RRN_reg);
+    insere_naoCheio_B(node.p[qtd], reg, RRN_reg);
 	}
 
   /*

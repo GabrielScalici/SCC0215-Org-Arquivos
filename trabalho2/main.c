@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
         //Fim da criação do arquivo de dados
 
         //Criando a Árvore B
-        b = criar_indice(argv[2], reg);
+        b = criar_indice(reg, qtdRegs);
 
 
     }
