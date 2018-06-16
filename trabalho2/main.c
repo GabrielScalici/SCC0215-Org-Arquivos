@@ -34,17 +34,17 @@ int main(int argc, char *argv[]){
       cab.status = '0';
 
       //Descobre tamanho do arquivo e volta para o início do mesmo
-		qtdRegs=0;
-		i=0;
-		c = fgetc(f);
-		while(c!= EOF){
-			if(c == '\n')qtdRegs++;
-			c = fgetc(f);
-		}
+  		qtdRegs=0;
+  		i=0;
+  		c = fgetc(f);
+  		while(c!= EOF){
+  			if(c == '\n')qtdRegs++;
+  			c = fgetc(f);
+  		}
 
-		fseek(f, 0, SEEK_SET);
+  		fseek(f, 0, SEEK_SET);
 
-		printf("%d\n",qtdRegs);
+  		printf("%d\n",qtdRegs);
       reg = recuperar_registros(f,qtdRegs);
 
                 printf("\n\n0\t Prestadora: %s - %d\n", reg[1].prestadora, reg[1].tam_prestadora);
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
         //Fim da criação do arquivo de dados
 
         //Criando a Árvore B
-        b = criar_indice(argv[2]);
+        b = criar_indice(argv[2], reg);
 
 
     }

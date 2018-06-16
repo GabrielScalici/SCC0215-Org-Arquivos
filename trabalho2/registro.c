@@ -31,7 +31,6 @@
 */
 FILE* cria_arquivo(char *arquivo){
     FILE *f;
-    Registro *reg;
 
     f = fopen(arquivo, "rb");       //Abre o arquivo em modo de leitura binária
     verifica_arquivo(f, CARREGANDO);            //Verifica se o arquivo abriu corretamente
@@ -713,26 +712,26 @@ void busca_rrn_parametro(char* campo, char* valor){
 }
 
 
-FILE* criar_indice(char *arquivo){
+FILE* criar_indice(char *arquivo, Registro *reg){
     FILE* b;
 
     //Criando o arquivo de dados chamado de (teste.bin)
     b = cria_arquivo(arquivo);
 
     //Criando o cabecalho arvore B chamado (arvoreB.bin)
-    criar_arvore_B();
+    criar_arvore_B(reg);
 
     return b;
 
 }
 
 //Funcao para criar o cabealho no arquivo de arvore B
-void criar_arvore_B(){
-    FILE* f;
+void criar_arvore_B(Registro *reg){
+    FILE* b;
     int tamAtual;
     char c = '0';
-    f = fopen("arvoreB.bin", "wb");
-    verifica_arquivo(f, CARREGANDO);
+    b = fopen("arvoreB.bin", "wb");
+    verifica_arquivo(b, CARREGANDO);
 
 
     //Cria um cabecalho auxiliar
@@ -743,24 +742,27 @@ void criar_arvore_B(){
     cab.ultimoRRN = -1;
 
     //Escreve o cabecalho no arquivo
-    fwrite(&cab.status, sizeof(char), 1, f);
-    fwrite(&cab.noRaiz,sizeof(int),1,f);
-    fwrite(&cab.altura,sizeof(int),1,f);
-    fwrite(&cab.ultimoRRN,sizeof(int),1,f);
+    fwrite(&cab.status, sizeof(char), 1, b);
+    fwrite(&cab.noRaiz,sizeof(int),1,b);
+    fwrite(&cab.altura,sizeof(int),1,b);
+    fwrite(&cab.ultimoRRN,sizeof(int),1,b);
 
+
+    inserir_B(reg[0], 0);
 }
 
 void inserir_B(Registro reg, int RRN_reg){
     FILE *b;
     int i, j;
     Cabecalho_B cab;
+    arvoreB node;
 
     //Lendo o arquivo o arquivo da arvore B
-    b = fopen("teste.bin", "w+b");
+    b = fopen("arvoreB.bin", "w+b");
 
     //TUDO CABEÇALHO
     //Alterar o status
-    char status;
+    char status = '1';
     fwrite(&status, sizeof(char), 1, b);
     cab.status = status;
 
@@ -781,7 +783,35 @@ void inserir_B(Registro reg, int RRN_reg){
 
     //Checar se a arvore esta vazia
     if(rrn_no_raiz == -1){
-        //Adicionar no no raiz
+      //volta para o inicio pulando o status
+      fseek(b, 1, SEEK_SET);
+      //atualiza o no raiz
+      cab.noRaiz = 0;
+      fwrite(&cab.noRaiz, sizeof(int), 1, b);
+      //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
+      fseek(b, sizeof(int), SEEK_CUR);
+      //atualiza ultimoRRN
+      cab.ultimoRRN = 0;
+      fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+      //Insere primeiro registro
+      node.n = 1;
+      node.p;
+      for(i = 0; i < 10; i++) node.p[i] = -1;
+      node.c[0] = reg.codINEP;
+      node.pr[0] = RRN_reg;
+      fwrite(&node.n, sizeof(int), 1, b);
+      fwrite(&node.p[0], sizeof(int), 1, b);
+      fwrite(&node.c[0], sizeof(int), 1, b);
+      fwrite(&node.pr[0], sizeof(int), 1, b);
+
+      //Seta os demais ponteiros como -1
+      for(i = 1; i < 9; i++){
+        fwrite(&node.p[i], sizeof(int), 1, b);
+        //pula c[i] e pr[i](8 bytes)
+        fseek(b, 2*sizeof(int), SEEK_CUR);
+      }
+      fwrite(&node.p[9], sizeof(int), 1, b);
     }else{
         //Vai para o indice indicado no no raiz
         fseek(b, TAM_NO_INDICE*rrn_no_raiz, SEEK_CUR);
@@ -847,6 +877,7 @@ void inserir_B(Registro reg, int RRN_reg){
 
     //Atualizando o status
     fseek(b,0,SEEK_SET);
+    status = '0';
     fwrite(&status, sizeof(char), 1, b);
 
     fclose(b);
