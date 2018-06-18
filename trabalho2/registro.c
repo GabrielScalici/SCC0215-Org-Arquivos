@@ -752,7 +752,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fclose(b);
 
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 8; i++){
+    for(int i = 0; i < 9; i++){
       printf("%d\n", i);
       inserir_B(reg[i], i);
     }
@@ -859,7 +859,7 @@ void inserir_B(Registro reg, int RRN_reg){
             fwrite(&rrn_no_raiz, sizeof(int), 1, b);
             for(i = 1;i < n_no;i++){
                 fseek(b, 8, SEEK_CUR);
-                fwrite(&aux_m1, 1, sizeof(int), b);
+                fwrite(&aux_m1, sizeof(int), 1, b);
             }
         	//Faz o split da antiga raiz
         	//split_B();
@@ -870,8 +870,6 @@ void inserir_B(Registro reg, int RRN_reg){
         	//Insere na raiz
         	insere_naoCheio_B(cab.noRaiz, reg, RRN_reg);
         }
-
-
     }
 /*
         Pseudocódigo Cormen:
@@ -914,26 +912,26 @@ void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
     FILE *b;
     int qtd;
     arvoreB node;
+    Cabecalho_B cab;
     int i, pos;
 
     b = fopen("arvoreB.bin", "r+b");
     //move o ponteiro para o nó desejado
-    fseek(b, sizeof(Cabecalho_B), SEEK_SET);
-    fseek(b, rrn_no*TAM_NO_INDICE, SEEK_CUR);
+    fseek(b, rrn_no*TAM_NO_INDICE + sizeof(Cabecalho_B) - 3, SEEK_SET);
 
     //lê a quantidade de chaves no nó
-    fread(&node.n, 1, sizeof(int), b);
-    printf("node.n = %d\n", node.n);
+    fread(&node.n, sizeof(int), 1, b);
+    //printf("node.n = %d\n", node.n);
     qtd = node.n;
 
     //lê todas as chaves/ponteiros do nó
     for(i = 0;i < qtd;i++){
-        fread(&node.p[i], 1, sizeof(int), b);
-        fread(&node.c[i], 1, sizeof(int), b);
-        fread(&node.pr[i], 1, sizeof(int), b);
+        fread(&node.p[i], sizeof(int), 1, b);
+        fread(&node.c[i], sizeof(int), 1, b);
+        fread(&node.pr[i], sizeof(int), 1, b);
     }
     //lê o último ponteiro
-    fread(&node.p[i], 1, sizeof(int), b);
+    fread(&node.p[i], sizeof(int), 1, b);
 
     //verifica o primeiro ponteiro
     if(node.p[0] == -1){    //-1 significa que é nó folha
@@ -941,9 +939,9 @@ void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
         node.c[pos] = reg.codINEP;
         node.pr[pos] = RRN_reg;
         node.n++;
-
+        printf("O N eh %d\n", node.n);
         //Retorna ao inicio do nó
-        fseek(b, -TAM_NO_INDICE, SEEK_CUR);
+        fseek(b, rrn_no*TAM_NO_INDICE+sizeof(Cabecalho_B) - 3, SEEK_SET);       //O ERRO TA POR AQUIIIIIII
         //Reescreve o nó atualizado no arquivo
         fwrite(&node.n, sizeof(int), 1, b);
         for(i=pos; i<node.n; i++){
@@ -960,7 +958,7 @@ void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
 		fseek(b, sizeof(Cabecalho_B), SEEK_SET);
 		fseek(b,  node.p[qtd]*TAM_NO_INDICE, SEEK_CUR);
 		//armazena o n do nó
-		fread(&qtd, 1, sizeof(int), b);
+		fread(&qtd, sizeof(int), 1, b);
 		//verifica se o nó está cheio
 		if(qtd == 9){ //talvez seja 8
 			//split_B();
