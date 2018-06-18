@@ -51,4 +51,51 @@ void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* 
 void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void busca_rrn_parametro(char* campo, char* valor);
 
+
+/*
+ *  PARTE 2
+ */
+
+ #define TAM_NO_INDICE 116
+
+ //Definindo o cabecalho do arquivo de arvore B
+ typedef struct{
+      char status;
+      int noRaiz;
+      int altura;
+      int ultimoRRN;
+ } Cabecalho_B;
+
+ /*
+  * N  = numero de registros na sub-arvore
+  * P  = Ponteiro para a sub arvore
+  * C  = Chave de busca
+  * PR = Referencia para o arquivo de dados
+  * Minimo de registros = 5
+  * Maximo de registros = 10
+ */
+ //Definindo os nos da arvore B
+ typedef struct{
+     int n;
+     int p[10];
+     int c[9];
+     int pr[9];
+ } arvoreB;
+
+//Definindo a estrutura da bufferpool
+ typedef struct{
+     arvoreB[5];
+     int freq[5];
+ }bPool;
+
+ /*
+  *  FUNCOES
+  */
+
+  arvoreB* get(int RRN);
+  void put(int RRN, arvoreB* page);
+  void flush();
+
+
+
 #endif

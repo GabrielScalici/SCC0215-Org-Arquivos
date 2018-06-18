@@ -11,7 +11,8 @@ enum options{
   INSERE = 6,
   ATUALIZA = 7,
   COMPACTA = 8,
-  RECUPERAREMOVIDOS = 9
+  RECUPERAREMOVIDOS = 9,
+  INSERIR_INDICE = 10,
 };
 
 int main(int argc, char *argv[]){
@@ -104,6 +105,34 @@ int main(int argc, char *argv[]){
         atualizar_registro(rrn, cod, data, uf, nome_esc, muni, prest);
 
         break;
+    }
+    case(INSERIR_INDICE):{
+        int tam;    //Tamanho do arquivo
+        int i;
+        char c;
+
+        //Criando o arquivo de Dados
+        f = cria_arquivo(argv[2]);  //argv[2] = nome do arquivo
+        cab.status = '0';
+
+        //Descobre tamanho do arquivo e volta para o início do mesmo
+          qtdRegs=0;
+          i=0;
+          c = fgetc(f);
+          while(c!= EOF){
+              if(c == '\n')qtdRegs++;
+              c = fgetc(f);
+          }
+          fseek(f, 0, SEEK_SET);
+
+        reg = recuperar_registros(f,qtdRegs);
+        transfere_arquivo(reg, qtdRegs);
+        //Fim da criação do arquivo de dados
+
+        //Criando a Árvore B
+        //b = criar_indice(reg, qtdRegs);
+
+
     }
 
   }

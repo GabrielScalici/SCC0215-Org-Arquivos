@@ -354,7 +354,7 @@ void printa_arquivo(){
     fwrite(&cab.status, sizeof(char), 1, f);    //Escreve o novo status do arquivo
 
     //Posição do primeiro registro
-    fseek(f, 5, SEEK_SET);      
+    fseek(f, 5, SEEK_SET);
 
     // printf("%c\t%d\n", cab.status, cab.topoPilha);
 
@@ -710,4 +710,27 @@ void busca_rrn_parametro(char* campo, char* valor){
 	}
 
     fclose(f);  //Fecha o arquivo
+}
+
+
+/*
+ *  PARTE 2
+ */
+
+
+/*
+ *  BUFFER POOL
+ */
+
+
+arvoreB* get(int RRN){
+
+}
+
+void put(int RRN, arvoreB* page){
+
+}
+
+void flush(){
+    
 }
