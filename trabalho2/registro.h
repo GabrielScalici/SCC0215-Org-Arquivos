@@ -92,10 +92,10 @@ typedef struct{
 }bPool;
 
 
+
  /*
   *  FUNCOES
   */
-
 
 FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
@@ -104,8 +104,9 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd);
 void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg);
 
 //Buffer pool
-arvoreB* get(int RRN);
-void put(int RRN, arvoreB* page);
-void flush();
+arvoreB* get(int RRN, bPool* bufPool);
+void put(int RRN, arvoreB* page, bPool* bufPool);
+void flush_full(bPool* bufPool);
+void flush(arvoreB* page, bPool* bufPool);
 
 #endif

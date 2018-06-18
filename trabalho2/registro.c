@@ -1089,10 +1089,10 @@ void pesquisa_B(){
  * BUFFER POOL
  */
 
-arvoreB* get(int RRN){
+arvoreB* get(int RRN, bPool* bufPool){
 
     //if esta no bufferpool
-        //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo IndexPage, chamada P
+        //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
         //2: realize possíveis restruturações na organização do buffer (LFU)
         //3: retorne P
 
@@ -1103,9 +1103,9 @@ arvoreB* get(int RRN){
 
 }
 
-void put(int RRN, arvoreB* page){
-    //if nao esta no buffer POOL
+void put(int RRN, arvoreB* page, bPool* bufPool){
 
+    //if nao esta no buffer POOL
         //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
         //3: caso contrário : remova uma página N do buffer e insira P (LFU)
@@ -1117,11 +1117,11 @@ void put(int RRN, arvoreB* page){
 
 }
 
-void flush(){
+void flush_full(bPool* bufPool){
     //Escrever no disco todas as paginas com modificacoes presentes no buffer
 }
 
-void flush(arvoreB* page){
+void flush(arvoreB* page, bPool* bufPool){
     //Escrever no disco uma pagina que foi modificada
     //Sempre chamada durante a realizacao as trocas de pagina a serem armazenadas no buffer
 }
