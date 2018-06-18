@@ -85,6 +85,7 @@ void busca_rrn_parametro(char* campo, char* valor);
 //Definindo a estrutura da bufferpool
  typedef struct{
      arvoreB[5];
+     int RRN[5];
      int freq[5];
  }bPool;
 

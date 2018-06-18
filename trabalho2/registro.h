@@ -84,6 +84,14 @@ void busca_rrn_parametro(char* campo, char* valor);
      int pr[9];
  } arvoreB;
 
+//Definindo a estrutura da bufferpool
+typedef struct{
+    arvoreB[5];
+    int RRN[5];
+    int freq[5];
+}bPool;
+
+
  /*
   *  FUNCOES
   */
@@ -94,5 +102,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs);
 void inserir_B(Registro reg, int RRN_reg);
 int ordena_no_B(arvoreB *node, Registro reg, int qtd);
 void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg);
+
+//Buffer pool
+arvoreB* get(int RRN);
+void put(int RRN, arvoreB* page);
+void flush();
 
 #endif

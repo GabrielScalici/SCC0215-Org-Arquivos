@@ -1080,8 +1080,23 @@ void pesquisa_B(){
         return
       }
       else PESQUISA(p[i], k);
-
-
     }
   */
+}
+
+
+/*
+ * BUFFER POOL
+ */
+
+arvoreB* get(int RRN){
+    
+}
+
+void put(int RRN, arvoreB* page){
+    
+}
+
+void flush(){
+    
 }
