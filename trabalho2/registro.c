@@ -886,7 +886,7 @@ void inserir_B(Registro reg, int RRN_reg){
     				n[novRaiz] = 0
     				p1[novaRaiz] = raiz(antiga)
     				SPLIT(novaRaiz, 5, raiz(antiga))
-    				B-TREE-INSERT-NONFULL(raiz, k) 
+    				B-TREE-INSERT-NONFULL(raiz, k)
     			}
     			else B-TREE-INSERT-NONFULL(raiz, k)
         }
@@ -917,7 +917,7 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
       printf("node->c[%d] = %d\n", j, node->c[j]);
       printf("node->pr[%d] = %d\n", j, node->pr[j]);
     }
-    
+
     return i;
 }
 
@@ -1015,12 +1015,12 @@ void split_B(){
   SPLIT(no pai, i, no filhoCheio){
          aloca novoNo //aloca no ultimoRRN+1
           n[novoNo] = 4
-          
+
           for(j = 0; j++; j<4){}
               cj[novoNo] = cj+5[filhoCheio]
               prj[novoNo] = prj+5[filhoCheio]
           }
-           
+
           if(p0[filhoCheio] != -1){ //checa se nao é no folha
             for(j=0; j++; j<5)
               pj[novoNo] = pj+5[filhoCheio]
@@ -1090,13 +1090,38 @@ void pesquisa_B(){
  */
 
 arvoreB* get(int RRN){
-    
+
+    //if esta no bufferpool
+        //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo IndexPage, chamada P
+        //2: realize possíveis restruturações na organização do buffer (LFU)
+        //3: retorne P
+
+    //else nao esta no buffer
+        //1: recupere o conteúdo da página do disco e armazena em uma variável auxiliar do tipo IndexPage, chamada P
+        //2: insira P no buffer, chamando a função put
+        //3: retorne P.
+
 }
 
 void put(int RRN, arvoreB* page){
-    
+    //if nao esta no buffer POOL
+
+        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P
+        //2: se o buffer conter espaço disponível : insira P no espaço disponível
+        //3: caso contrário : remova uma página N do buffer e insira P (LFU)
+
+    //else se esta no buffer
+        //1: recuper e a página armazenada no buffer e atualize seu conteúdo
+        //2: marque que P é uma página modificada
+        //3: reorganize a estrutura interna do buffer (LFU)
+
 }
 
 void flush(){
-    
+    //Escrever no disco todas as paginas com modificacoes presentes no buffer
+}
+
+void flush(arvoreB* page){
+    //Escrever no disco uma pagina que foi modificada
+    //Sempre chamada durante a realizacao as trocas de pagina a serem armazenadas no buffer
 }
