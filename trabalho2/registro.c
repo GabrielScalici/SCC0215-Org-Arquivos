@@ -716,7 +716,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
 
     //Criando o arquivo de dados chamado de (teste.bin)
-    b = fopen("arvoreB.bin.bin", "wb");
+    b = fopen("arvoreB.bin", "wb");
     verifica_arquivo(b, CARREGANDO);
 
     //Criando o cabecalho arvore B chamado (arvoreB.bin)
@@ -756,8 +756,13 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
       printf("%d\n", i);
       inserir_B(reg[i], i);
     }
-    
-    
+
+    //-----------------SÓ PRA TESTAR-----------------------
+    b = fopen("arvoreB.bin", "rb");
+    fseek(b, 13 + 4 + 4 + 4, SEEK_SET);
+    int resp;
+    fread(&resp, sizeof(int), 1, b);
+    printf("RESP = %d\n", resp);
 }
 
 void inserir_B(Registro reg, int RRN_reg){
@@ -904,6 +909,14 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
         node->pr[i] = node->pr[i-1];
         i--;
     }
+
+    printf("i = %d\n", i);
+
+    for (int j = 0; j <= qtd; j++){
+      printf("node->p[%d] = %d\n", j, node->p[j]);
+      printf("node->c[%d] = %d\n", j, node->c[j]);
+      printf("node->pr[%d] = %d\n", j, node->pr[j]);
+    }
     
     return i;
 }
@@ -941,15 +954,16 @@ void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
         node.n++;
         printf("O N eh %d\n", node.n);
         //Retorna ao inicio do nó
-        fseek(b, rrn_no*TAM_NO_INDICE+sizeof(Cabecalho_B) - 3, SEEK_SET);       //O ERRO TA POR AQUIIIIIII
+        fseek(b, rrn_no*TAM_NO_INDICE+sizeof(Cabecalho_B) - 3, SEEK_SET);
         //Reescreve o nó atualizado no arquivo
         fwrite(&node.n, sizeof(int), 1, b);
+        printf("POS = %d\n", pos);
         for(i=pos; i<node.n; i++){
           fseek(b, sizeof(int), SEEK_CUR);
           fwrite(&node.c[i], sizeof(int), 1, b);
           fwrite(&node.pr[i], sizeof(int), 1, b);
         }
-
+        fclose(b);
     }else{					//não é nó folha
 		//procura o ponteiro que irá "descer"
 		while(qtd >= 0 && reg.codINEP < node.c[qtd])	qtd--;
