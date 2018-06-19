@@ -86,12 +86,10 @@ void busca_rrn_parametro(char* campo, char* valor);
 
 //Definindo a estrutura da bufferpool
 typedef struct{
-    arvoreB[5];
-    int RRN[5]; //Auxiliar para saber onde sera escrito no arquivo de indice
+    arvoreB node[5];
+    int RRN[5];         //Auxiliar para saber onde sera escrito no arquivo de indice
     int freq[5];
 }bPool;
-
-
 
  /*
   *  FUNCOES
@@ -104,9 +102,9 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd);
 void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg);
 
 //Buffer pool
-arvoreB* get(int RRN, bPool* bufPool);
-void put(int RRN, arvoreB* page, bPool* bufPool);
-void flush_full(bPool* bufPool);
-void flush(arvoreB* page, bPool* bufPool);
+arvoreB* get(int RRN, bPool* bufPool);                  //Recupera o conteúdo de um nó
+void put(int RRN, arvoreB* page, bPool* bufPool);       //Armazena página no buffer
+void flush_full(bPool* bufPool);                        //Manda todas as páginas pro arquivo
+void flush(arvoreB* page, bPool* bufPool);              //Manda uma página específica pro arquivo
 
 #endif

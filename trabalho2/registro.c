@@ -715,7 +715,12 @@ void busca_rrn_parametro(char* campo, char* valor){
 ********* T2 ***********
 ********************** */
 
+//Buffer Pool
+arvoreB* get(int RRN, bPool* bufPool){
+    arvoreB* b;
+}
 
+//Indice
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
 
@@ -771,19 +776,19 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
 
 void inserir_B(Registro reg, int RRN_reg){
 /*
-        Pseudocódigo Cormen:
+    Pseudocódigo Cormen:
 
-        B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
-    			if(n[raiz]==9){
-    				aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
-    				cab.raiz = novaRaiz	//atualiza o cabeçalho
-    				n[novRaiz] = 0
-    				p1[novaRaiz] = raiz(antiga)
-    				SPLIT(novaRaiz, 5, raiz(antiga))
-    				B-TREE-INSERT-NONFULL(raiz, k)
-    			}
-    			else B-TREE-INSERT-NONFULL(raiz, k)
-        }
+    B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
+            if(n[raiz]==9){
+                aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
+                cab.raiz = novaRaiz	//atualiza o cabeçalho
+                n[novRaiz] = 0
+                p1[novaRaiz] = raiz(antiga)
+                SPLIT(novaRaiz, 5, raiz(antiga))
+                B-TREE-INSERT-NONFULL(raiz, k)
+            }
+            else B-TREE-INSERT-NONFULL(raiz, k)
+    }
     */
 }
 
@@ -811,27 +816,27 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
 void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
   /*
   B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-          i = n[x]
-          if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
-            while(i>=0 && k<ci[x]){
-              ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
-              i--
-            }
-            ci+1[x] = k
-            n[x]++
-          }
-          else{
-            while(i>=0 && k<ci[x])
-              i--
-            i++
-            FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
-            if(n[pi[x]] == 9){
-              SPLIT(x, i+1, pi[x])
-              if(k > ci[x]) i++ (?)
-            }
-            B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
-          }
+        i = n[x]
+        if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
+        while(i>=0 && k<ci[x]){
+            ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
+            i--
         }
+        ci+1[x] = k
+        n[x]++
+        }
+        else{
+        while(i>=0 && k<ci[x])
+            i--
+        i++
+        FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
+        if(n[pi[x]] == 9){
+            SPLIT(x, i+1, pi[x])
+            if(k > ci[x]) i++ (?)
+        }
+        B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
+        }
+    }
   */
 }
 
