@@ -711,6 +711,10 @@ void busca_rrn_parametro(char* campo, char* valor){
     fclose(f);  //Fecha o arquivo
 }
 
+/* *********************
+********* T2 ***********
+********************** */
+
 
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
@@ -750,7 +754,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
 
     fclose(b);
-
+/* 
     //insere todos os registros do arquivo de dados no arquivo de indices
     for(int i = 0; i < 9; i++){
       printf("%d\n", i);
@@ -762,120 +766,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fseek(b, 13 + 4 + 4 + 4, SEEK_SET);
     int resp;
     fread(&resp, sizeof(int), 1, b);
-    printf("RESP = %d\n", resp);
+    printf("RESP = %d\n", resp); */
 }
 
 void inserir_B(Registro reg, int RRN_reg){
-    FILE *b;
-    int i, j;
-    Cabecalho_B cab;
-    arvoreB node;
-
-    //Lendo o arquivo o arquivo da arvore B
-    b = fopen("arvoreB.bin", "r+b");
-    fseek(b, 0, SEEK_SET);
-    //TUDO CABEÇALHO
-    //Alterar o status
-    char status = '1';
-    fread(&status, sizeof(char), 1, b);
-    printf("status %c\n", status);
-    cab.status = status;
-
-    //Lendo o no raiz
-    int rrn_no_raiz;
-    fread(&rrn_no_raiz, sizeof(int), 1, b);
-    printf("rrn_no_raiz %d\n", rrn_no_raiz);
-    cab.noRaiz = rrn_no_raiz;
-
-    //Lendo a altura da arvore
-    int altura_B;
-    fread(&altura_B, sizeof(int), 1, b);
-    printf("altura_B %d\n", altura_B);
-    cab.altura = altura_B;
-
-    //Lendo o ultimo RRN da arvore
-    int lastRRN;
-    fread(&lastRRN, sizeof(int), 1, b);
-    printf("lastRRN %d\n", lastRRN);
-    cab.ultimoRRN = lastRRN;
-
-    //Checar se a arvore esta vazia
-    if(rrn_no_raiz == -1){
-      //volta para o inicio pulando o status
-      fseek(b, 1, SEEK_SET);
-      //atualiza o no raiz
-      cab.noRaiz = 0;
-      fwrite(&cab.noRaiz, sizeof(int), 1, b);
-      //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
-      fseek(b, sizeof(int), SEEK_CUR);
-      //atualiza ultimoRRN
-      cab.ultimoRRN = 0;
-      fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
-
-      //Insere primeiro registro
-      node.n = 1;
-      node.p;
-      for(i = 0; i < 10; i++) node.p[i] = -1;
-      node.c[0] = reg.codINEP;
-      node.pr[0] = RRN_reg;
-      fwrite(&node.n, sizeof(int), 1, b);
-      fwrite(&node.p[0], sizeof(int), 1, b);
-      fwrite(&node.c[0], sizeof(int), 1, b);
-      fwrite(&node.pr[0], sizeof(int), 1, b);
-
-      //Seta os demais ponteiros como -1
-      for(i = 1; i < 9; i++){
-        fwrite(&node.p[i], sizeof(int), 1, b);
-        //pula c[i] e pr[i](8 bytes)
-        fseek(b, 2*sizeof(int), SEEK_CUR);
-      }
-      fwrite(&node.p[9], sizeof(int), 1, b);
-    }else{
-        //Vai para o indice indicado no no raiz
-        fseek(b, TAM_NO_INDICE*rrn_no_raiz, SEEK_CUR);
-
-        //Verifica o valor de n
-        int n_no;
-        fread(&n_no, sizeof(int), 1, b);
-        printf("n_no = %d\n", n_no);
-
-        //Checa se o no está cheio
-        if(n_no == 9){
-        	//atualiza o cabeçalho pulando o char
-        	fseek(b, 1, SEEK_SET);
-        	//atualiza o noRaiz;
-        	cab.noRaiz = cab.ultimoRRN + 1;
-        	fwrite(&cab.noRaiz, sizeof(int), 1, b);
-        	//atualiza a altura da arvore
-        	cab.altura++;
-        	fwrite(&cab.altura, sizeof(int), 1, b);
-        	//atualiza o ultimoRRN
-        	cab.ultimoRRN++;
-        	fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
-
-        	//aloca o novo nó
-        	//vai até o ultimo RRN
-        	fseek(b, cab.ultimoRRN*TAM_NO_INDICE, SEEK_CUR);
-            //Escreve o n do nó
-            int aux_zero = 0;
-            int aux_m1 = -1;
-        	fwrite(&aux_zero, sizeof(int), 1, b);
-        	//Atualiza p[0] como a antiga raiz
-            fwrite(&rrn_no_raiz, sizeof(int), 1, b);
-            for(i = 1;i < n_no;i++){
-                fseek(b, 8, SEEK_CUR);
-                fwrite(&aux_m1, sizeof(int), 1, b);
-            }
-        	//Faz o split da antiga raiz
-        	//split_B();
-        	//Insere o novo item no nó que foi splitado
-        	//insere_naoCheio();
-        }
-        else{
-        	//Insere na raiz
-        	insere_naoCheio_B(cab.noRaiz, reg, RRN_reg);
-        }
-    }
 /*
         Pseudocódigo Cormen:
 
@@ -891,17 +785,10 @@ void inserir_B(Registro reg, int RRN_reg){
     			else B-TREE-INSERT-NONFULL(raiz, k)
         }
     */
-
-    //Atualizando o status
-    fseek(b,0,SEEK_SET);
-    status = '0';
-    fwrite(&status, sizeof(char), 1, b);
-
-    fclose(b);
 }
 
 int ordena_no_B(arvoreB *node, Registro reg, int qtd){
-	  int i = qtd;
+	int i = qtd;
 
     while(i >= 0 && reg.codINEP < node->c[i]){
         node->p[i] = node->p[i-1];
@@ -922,67 +809,6 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
 }
 
 void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
-    FILE *b;
-    int qtd;
-    arvoreB node;
-    Cabecalho_B cab;
-    int i, pos;
-
-    b = fopen("arvoreB.bin", "r+b");
-    //move o ponteiro para o nó desejado
-    fseek(b, rrn_no*TAM_NO_INDICE + sizeof(Cabecalho_B) - 3, SEEK_SET);
-
-    //lê a quantidade de chaves no nó
-    fread(&node.n, sizeof(int), 1, b);
-    //printf("node.n = %d\n", node.n);
-    qtd = node.n;
-
-    //lê todas as chaves/ponteiros do nó
-    for(i = 0;i < qtd;i++){
-        fread(&node.p[i], sizeof(int), 1, b);
-        fread(&node.c[i], sizeof(int), 1, b);
-        fread(&node.pr[i], sizeof(int), 1, b);
-    }
-    //lê o último ponteiro
-    fread(&node.p[i], sizeof(int), 1, b);
-
-    //verifica o primeiro ponteiro
-    if(node.p[0] == -1){    //-1 significa que é nó folha
-        pos = ordena_no_B(&node, reg, qtd);
-        node.c[pos] = reg.codINEP;
-        node.pr[pos] = RRN_reg;
-        node.n++;
-        printf("O N eh %d\n", node.n);
-        //Retorna ao inicio do nó
-        fseek(b, rrn_no*TAM_NO_INDICE+sizeof(Cabecalho_B) - 3, SEEK_SET);
-        //Reescreve o nó atualizado no arquivo
-        fwrite(&node.n, sizeof(int), 1, b);
-        printf("POS = %d\n", pos);
-        for(i=pos; i<node.n; i++){
-          fseek(b, sizeof(int), SEEK_CUR);
-          fwrite(&node.c[i], sizeof(int), 1, b);
-          fwrite(&node.pr[i], sizeof(int), 1, b);
-        }
-        fclose(b);
-    }else{					//não é nó folha
-		//procura o ponteiro que irá "descer"
-		while(qtd >= 0 && reg.codINEP < node.c[qtd])	qtd--;
-		qtd++;
-		//posiciona o leitor no nó correto
-		fseek(b, sizeof(Cabecalho_B), SEEK_SET);
-		fseek(b,  node.p[qtd]*TAM_NO_INDICE, SEEK_CUR);
-		//armazena o n do nó
-		fread(&qtd, sizeof(int), 1, b);
-		//verifica se o nó está cheio
-		if(qtd == 9){ //talvez seja 8
-			//split_B();
-			//if(reg.codINEP > node.c[qtd]) qtd++; //nao sei se precisa
-		}
-
-    //recursao
-    insere_naoCheio_B(node.p[qtd], reg, RRN_reg);
-	}
-
   /*
   B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
           i = n[x]
