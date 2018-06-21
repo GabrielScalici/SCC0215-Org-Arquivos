@@ -736,7 +736,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
 //Funcao para criar o cabealho no arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
     FILE *b;
-    bPool bp;
+    bPool *bp;
     arvoreB *root = NULL;
     int tamAtual = 0;       //Numero de nós na árvore
     int i, j = 0;
@@ -774,9 +774,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
 
     //Inicializando o buffer pool
+    bp = (bPool *) calloc(1, sizeof(bPool));
     for(i = 0;i < TAM_BUFFER;i++){
-        bp.RRN[i] = -1;
-        bp.freq[i] = 0;
+        bp->RRN[i] = -1;
+        bp->freq[i] = 0;
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
@@ -794,7 +795,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     printf("RESP = %d\n", resp); */
 }
 
-void inserir_B(Registro reg, int RRN_reg){
+void inserir_B(Registro reg, int RRN_reg, bPool *bp){
 /*
     Pseudocódigo Cormen:
 
@@ -833,7 +834,7 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
     return i;
 }
 
-void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
+void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg, bPool *bp){
   /*
   B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
         i = n[x]
@@ -967,18 +968,21 @@ arvoreB* get(int RRN, bPool *bufPool){
                 aux->pr[j] = bufPool->node[i].pr[j];
             }
             aux->p[j] = bufPool->node[i].p[j];          //Copia o último ponteiro (n+1)
-            bufPool->freq[i]++;                           //Atualiza a frequência
-            break;                                          //Sai do for()
-        }else{
-            //Nao esta no bp
+            bufPool->freq[i]++;                         //Atualiza a frequência
+            break;                                      //Sai do for()
         }
+    }
+
+    //Verifica se percorrer todo o buffer
+    if(i == TAM_BUFFER){
+        //Não está no buffer
     }
 
     return aux;
 
 }
 
-void put(int RRN, arvoreB* page, bPool* bufPool){
+void put(int RRN, arvoreB *page, bPool *bufPool){
 
     //if nao esta no buffer POOL
         //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P
@@ -990,15 +994,31 @@ void put(int RRN, arvoreB* page, bPool* bufPool){
         //2: marque que P é uma página modificada
         //3: reorganize a estrutura interna do buffer (LFU)
 
-    int i;
+    int i, j;
+    int isVazio = 0;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
     arvoreB *aux;
 
+    aux = (arvoreB *) calloc(1, sizeof(arvoreB));
+
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
+        //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
+        if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = 1;    
         if(bufPool->RRN[i] == RRN){
             //Está no buffer
-        }else{
-            //Não está no buffer
         }
+    }
+
+    //Verifica se percorrer todo o buffer
+    if(i == TAM_BUFFER){
+        //Copia o conteúdo para uma variável auxiliar
+        for(j = 0;j < 9;j++){
+            aux->p[j] = page->p[j];
+            aux->c[j] = page->c[j];
+            aux->pr[j] = page->pr[j];
+        }
+        aux->p[j] = page->p[j];                 //Copia o último ponteiro (n+1)
+
+        
     }
 }
 
