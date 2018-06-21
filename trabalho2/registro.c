@@ -737,7 +737,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
 //Funcao para criar o cabealho no arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
     FILE *b;
-    bPool *bp;
+    bPool *bp;  //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
     arvoreB *root = NULL;
     int tamAtual = 0;       //Numero de nós na árvore
     int i, j = 0;
@@ -970,11 +970,12 @@ arvoreB* get(int RRN, bPool *bufPool){
             }
             aux->p[j] = bufPool->node[i].p[j];          //Copia o último ponteiro (n+1)
             bufPool->freq[i]++;                         //Atualiza a frequência
+
             break;                                      //Sai do for()
         }
     }
 
-    //Verifica se percorrer todo o buffer
+    //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
         //Não está no buffer
     }
@@ -1006,11 +1007,19 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
         if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = i;    
         if(bufPool->RRN[i] == RRN){
-            //Está no buffer
+            for(j = 0;j < 9;j++){
+                bufPool->node[i].p[j] = page->p[j];
+                bufPool->node[i].c[j] = page->c[j];
+                bufPool->node[i].pr[j] = page->pr[j];
+            }
+            bufPool->node[i].p[j] = page->p[j];         //Copia o último ponteiro (n+!)
+            bufPool->freq[i]++;                         //Atualiza a frequencia
+
+            break;                                      //Sai do for()
         }
     }
 
-    //Verifica se percorrer todo o buffer
+    //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){     
         if(isVazio != 0){
             //Copia a árvore pro buffer
