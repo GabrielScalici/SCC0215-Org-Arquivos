@@ -13,6 +13,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "registro.h"
+#include <limits.h>
 
 
 /*
@@ -996,6 +997,10 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
 
     int i, j;
     int isVazio = 0;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
+    //Variáveis pra localizar o menos utilizado (LFU)
+    int menor = INT_MAX;      
+    int pos = -1;
+    int aux;
 
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
@@ -1009,6 +1014,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
     if(i == TAM_BUFFER){     
         if(isVazio != 0){
             //Copia a árvore pro buffer
+            bufPool->node[isVazio].n = page->n;
             for(j = 0;j < 9;j++){
                 bufPool->node[isVazio].p[j] = page->p[j];
                 bufPool->node[isVazio].c[j] = page->c[j];
@@ -1016,9 +1022,23 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             }
             bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
         }else{
-            //Politica de substituicao
+            //Acha a página menos frequentada
+            for(j = 0;j < TAM_BUFFER;j++){
+                if(bufPool->freq[j] < menor){
+                    menor = bufPool->freq[i];
+                    pos = j;
+                }
+            }
+
+            //Troca a página menos frequentada
+            bufPool->node[pos].n = page->n;
+            for(j = 0;j < 9;j++){
+                bufPool->node[pos].p[j] = page->p[j];
+                bufPool->node[pos].c[j] = page->c[j];
+                bufPool->node[pos].pr[j] = page->pr[j];
+            }
+            bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
         }
-        
     }
 }
 

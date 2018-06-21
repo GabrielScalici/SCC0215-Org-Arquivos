@@ -2,6 +2,7 @@
 #define REGISTRO_H
 #include <stdio.h>
 
+
 //Definindo o tamanho do registro
 #define TAM_REG 87
 //Definindo o delimitador de campo
