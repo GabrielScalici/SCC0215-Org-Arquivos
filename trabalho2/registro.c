@@ -985,7 +985,7 @@ arvoreB* get(int RRN, bPool *bufPool){
 void put(int RRN, arvoreB *page, bPool *bufPool){
 
     //if nao esta no buffer POOL
-        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P
+        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
         //3: caso contrário : remova uma página N do buffer e insira P (LFU)
 
@@ -996,28 +996,28 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
 
     int i, j;
     int isVazio = 0;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
-    arvoreB *aux;
-
-    aux = (arvoreB *) calloc(1, sizeof(arvoreB));
 
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
-        if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = 1;    
+        if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = i;    
         if(bufPool->RRN[i] == RRN){
             //Está no buffer
         }
     }
 
     //Verifica se percorrer todo o buffer
-    if(i == TAM_BUFFER){
-        //Copia o conteúdo para uma variável auxiliar
-        for(j = 0;j < 9;j++){
-            aux->p[j] = page->p[j];
-            aux->c[j] = page->c[j];
-            aux->pr[j] = page->pr[j];
+    if(i == TAM_BUFFER){     
+        if(isVazio != 0){
+            //Copia a árvore pro buffer
+            for(j = 0;j < 9;j++){
+                bufPool->node[isVazio].p[j] = page->p[j];
+                bufPool->node[isVazio].c[j] = page->c[j];
+                bufPool->node[isVazio].pr[j] = page->pr[j];
+            }
+            bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+        }else{
+            //Politica de substituicao
         }
-        aux->p[j] = page->p[j];                 //Copia o último ponteiro (n+1)
-
         
     }
 }
