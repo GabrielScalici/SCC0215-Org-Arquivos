@@ -960,6 +960,7 @@ arvoreB* get(int RRN, bPool *bufPool){
 
     aux = (arvoreB *) calloc(1, sizeof(arvoreB));
 
+    //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         if(bufPool->RRN[i] == RRN){         //RRN está no buffer
             aux->n = bufPool->node[i].n;    
@@ -976,6 +977,7 @@ arvoreB* get(int RRN, bPool *bufPool){
         }
     }
 
+    //Página não está no buffer
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
         b = fopen("arvoreB.bin", "r+b");
@@ -994,6 +996,7 @@ arvoreB* get(int RRN, bPool *bufPool){
         }
         fread(&aux->p[i], 1, sizeof(int), b);           //Copia o ultimo ponteiro (n+1)
 
+        //Coloca no buffer
         put(RRN, aux, bufPool);
     }
 
@@ -1020,6 +1023,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
     int pos = -1;
     int aux;
 
+    //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
         if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = i;    
@@ -1036,6 +1040,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
         }
     }
 
+    //Página não está no buffer
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){     
         if(isVazio != 0){
@@ -1056,6 +1061,8 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
                 }
             }
 
+            //Escreve a página no arquivo de índice
+            //flush(bPool->node[j], bPool);
             //Troca a página menos frequentada
             bufPool->node[pos].n = page->n;
             for(j = 0;j < 9;j++){
@@ -1063,7 +1070,8 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
                 bufPool->node[pos].c[j] = page->c[j];
                 bufPool->node[pos].pr[j] = page->pr[j];
             }
-            bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+            bufPool->node[isVazio].p[j] = page->p[j];               //Copia o último ponteiro (n+1)
+            bufPool->freq[isVazio] = 1;                             //Primeiro acesso
         }
     }
 }
