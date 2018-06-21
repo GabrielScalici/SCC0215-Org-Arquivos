@@ -766,6 +766,12 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     //Inicializando a ArvoreB
     root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
     tamAtual++; //=1
+    root[0].n = 0;
+    for(i = 0;i < 9;i++){
+        root[0].p[i] = -1;
+        root[0].c[i] = -1;
+        root[0].pr[i] = -1;
+    }
 
     //Inicializando o buffer pool
     for(i = 0;i < TAM_BUFFER;i++){
@@ -947,17 +953,28 @@ arvoreB* get(int RRN, bPool *bufPool){
         //3: retorne P.
 
     arvoreB *aux;
-    int i;
+    int i, j;
 
     aux = (arvoreB *) calloc(1, sizeof(arvoreB));
 
-    for(i = 0;i < TAM_BUFFER;i++){
-        if(bufPool->RRN[i] == RRN){
-            //Esta no bp
+    for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
+        if(bufPool[0].RRN[i] == RRN){       //RRN está no buffer
+            aux[0].n = bufPool[0].node[i].n;    
+            for(j = 0;j < bufPool[0].node[i].n;j++){        //Roda por todos os registros do nó
+                //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+                aux[0].p[j] = bufPool[0].node[i].p[j];
+                aux[0].c[j] = bufPool[0].node[i].c[j];
+                aux[0].pr[j] = bufPool[0].node[i].pr[j];
+            }
+            aux[0].p[j] = bufPool[0].node[i].p[j];          //Copia o último ponteiro (n+1)
+            bufPool[0].freq[i]++;                           //Atualiza a frequência
+            break;                                          //Sai do for()
         }else{
             //Nao esta no bp
         }
     }
+
+    return aux;
 
 }
 
