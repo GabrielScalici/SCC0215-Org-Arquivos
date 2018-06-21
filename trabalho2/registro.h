@@ -83,19 +83,20 @@ void busca_rrn_parametro(char* campo, char* valor);
      int p[10];
      int c[9];
      int pr[9];
- } arvoreB;
+ } arvoreB; 
 
 //Definindo a estrutura da bufferpool
 typedef struct{
     arvoreB node[TAM_BUFFER];
     int RRN[TAM_BUFFER];         //Auxiliar para saber onde sera escrito no arquivo de indice
     int freq[TAM_BUFFER];
-}bPool;
+} bPool;
 
  /*
   *  FUNCOES
   */
 
+//ArvoreB
 FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
 void inserir_B(Registro reg, int RRN_reg);

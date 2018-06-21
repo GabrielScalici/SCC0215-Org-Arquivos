@@ -719,15 +719,6 @@ void busca_rrn_parametro(char* campo, char* valor){
 ********* T2 ***********
 ********************** */
 
-//Buffer Pool
-/* arvoreB *get(int RRN, bPool *bufPool){
-    arvoreB *b;
-} */
-
-/* void put(int RRN, arvoreB* page, bPool *bufPool){
-    
-} */
-
 //Indice
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
@@ -746,7 +737,9 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
 void criar_arvore_B(Registro *reg, int qtdRegs){
     FILE *b;
     bPool bp;
-    int tamAtual, i;
+    arvoreB *root = NULL;
+    int tamAtual = 0;       //Numero de nós na árvore
+    int i, j = 0;
 
     b = fopen("arvoreB.bin", "w+b");
 
@@ -770,6 +763,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
 
     fclose(b);
 
+    //Inicializando a ArvoreB
+    root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
+    tamAtual++; //=1
+
     //Inicializando o buffer pool
     for(i = 0;i < TAM_BUFFER;i++){
         bp.RRN[i] = -1;
@@ -778,7 +775,8 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
  
     //insere todos os registros do arquivo de dados no arquivo de indices
     for(int i = 0; i < qtdRegs; i++){
-        //printf("%d\n", i);
+        //printf("%d\t%d\n", i, reg[i].codINEP);
+
         
     }
 /*
@@ -936,7 +934,7 @@ void pesquisa_B(){
  * BUFFER POOL
  */
 
-arvoreB* get(int RRN, bPool* bufPool){
+arvoreB* get(int RRN, bPool *bufPool){
 
     //if esta no bufferpool
         //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
@@ -947,6 +945,19 @@ arvoreB* get(int RRN, bPool* bufPool){
         //1: recupere o conteúdo da página do disco e armazena em uma variável auxiliar do tipo IndexPage, chamada P
         //2: insira P no buffer, chamando a função put
         //3: retorne P.
+
+    arvoreB *aux;
+    int i;
+
+    aux = (arvoreB *) calloc(1, sizeof(arvoreB));
+
+    for(i = 0;i < TAM_BUFFER;i++){
+        if(bufPool->RRN[i] == RRN){
+            //Esta no bp
+        }else{
+            //Nao esta no bp
+        }
+    }
 
 }
 
