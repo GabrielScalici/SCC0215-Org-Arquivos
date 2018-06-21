@@ -59,6 +59,7 @@ void busca_rrn_parametro(char* campo, char* valor);
  */
 
  #define TAM_NO_INDICE 116
+ #define TAM_BUFFER 5
 
  //Definindo o cabecalho do arquivo de arvore B
  typedef struct{
@@ -86,9 +87,9 @@ void busca_rrn_parametro(char* campo, char* valor);
 
 //Definindo a estrutura da bufferpool
 typedef struct{
-    arvoreB node[5];
-    int RRN[5];         //Auxiliar para saber onde sera escrito no arquivo de indice
-    int freq[5];
+    arvoreB node[TAM_BUFFER];
+    int RRN[TAM_BUFFER];         //Auxiliar para saber onde sera escrito no arquivo de indice
+    int freq[TAM_BUFFER];
 }bPool;
 
  /*

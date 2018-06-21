@@ -58,6 +58,8 @@ int main(int argc, char *argv[]){
 
 			transfere_arquivo(reg, qtdRegs);
 
+			fclose(f);
+
 			break;
 		}
 		case(RECUPERA):{
@@ -132,6 +134,8 @@ int main(int argc, char *argv[]){
 
 			//Criando a Árvore B
 			b = criar_indice(reg, qtdRegs);
+
+			fclose(f);
 			
 			break;
 		}

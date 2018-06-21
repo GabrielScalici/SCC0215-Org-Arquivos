@@ -181,6 +181,8 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
         }
        // fwrite(&reg[i],TAM_REG, 1, f);
     }
+
+    fclose(f);
 }
 
 void busca_rrn(int RRN){
@@ -402,6 +404,8 @@ void printa_arquivo(){
     fseek(f, 0, SEEK_SET);
     cab.status = '1';
     fwrite(&cab.status, sizeof(char), 1, f);
+
+    fclose(f);
 
     return;
 }
@@ -716,9 +720,13 @@ void busca_rrn_parametro(char* campo, char* valor){
 ********************** */
 
 //Buffer Pool
-arvoreB* get(int RRN, bPool* bufPool){
-    arvoreB* b;
-}
+/* arvoreB *get(int RRN, bPool *bufPool){
+    arvoreB *b;
+} */
+
+/* void put(int RRN, arvoreB* page, bPool *bufPool){
+    
+} */
 
 //Indice
 FILE* criar_indice(Registro *reg, int qtdRegs){
@@ -736,8 +744,10 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
 
 //Funcao para criar o cabealho no arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
-    FILE* b;
-    int tamAtual;
+    FILE *b;
+    bPool bp;
+    int tamAtual, i;
+
     b = fopen("arvoreB.bin", "w+b");
 
     //Cria um cabecalho auxiliar
@@ -759,13 +769,19 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
 
     fclose(b);
-/* 
-    //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 9; i++){
-      printf("%d\n", i);
-      inserir_B(reg[i], i);
-    }
 
+    //Inicializando o buffer pool
+    for(i = 0;i < TAM_BUFFER;i++){
+        bp.RRN[i] = -1;
+        bp.freq[i] = 0;
+    }
+ 
+    //insere todos os registros do arquivo de dados no arquivo de indices
+    for(int i = 0; i < qtdRegs; i++){
+        //printf("%d\n", i);
+        
+    }
+/*
     //-----------------SÓ PRA TESTAR-----------------------
     b = fopen("arvoreB.bin", "rb");
     fseek(b, 13 + 4 + 4 + 4, SEEK_SET);
