@@ -956,11 +956,12 @@ arvoreB* get(int RRN, bPool *bufPool){
 
     arvoreB *aux;
     int i, j;
+    FILE *b;
 
     aux = (arvoreB *) calloc(1, sizeof(arvoreB));
 
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
-        if(bufPool->RRN[i] == RRN){       //RRN está no buffer
+        if(bufPool->RRN[i] == RRN){         //RRN está no buffer
             aux->n = bufPool->node[i].n;    
             for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
                 //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
@@ -977,7 +978,23 @@ arvoreB* get(int RRN, bPool *bufPool){
 
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
-        //Não está no buffer
+        b = fopen("arvoreB.bin", "r+b");
+        //Checar cabeçalho
+        //Pulando o cabeçalho
+        fseek(b, TAM_CAB_INDICE, SEEK_SET);
+        //Indo pro RRN desejado
+        fseek(b, RRN, SEEK_CUR);
+
+        //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+        fread(&aux->n, 1, sizeof(int), b);
+        for(j = 0;j < bufPool->node[i].n;j++){          //Roda por todos os registros do nó
+            fread(&aux->p[i], 1, sizeof(int), b);
+            fread(&aux->c[i], 1, sizeof(int), b);
+            fread(&aux->pr[i], 1, sizeof(int), b);
+        }
+        fread(&aux->p[i], 1, sizeof(int), b);           //Copia o ultimo ponteiro (n+1)
+
+        put(RRN, aux, bufPool);
     }
 
     return aux;

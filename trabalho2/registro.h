@@ -60,6 +60,7 @@ void busca_rrn_parametro(char* campo, char* valor);
  */
 
  #define TAM_NO_INDICE 116
+ #define TAM_CAB_INDICE 13
  #define TAM_BUFFER 5
 
  //Definindo o cabecalho do arquivo de arvore B
