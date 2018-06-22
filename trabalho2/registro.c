@@ -783,9 +783,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
  
     //insere todos os registros do arquivo de dados no arquivo de indices
     for(int i = 0; i < qtdRegs; i++){
-        //printf("%d\t%d\n", i, reg[i].codINEP);
-
-        
+        inserir_B(reg[i], i, bp); 
     }
 /*
     //-----------------SÓ PRA TESTAR-----------------------
@@ -797,7 +795,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
 }
 
 void inserir_B(Registro reg, int RRN_reg, bPool *bp){
-/*
+  /*
     Pseudocódigo Cormen:
 
     B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
@@ -807,11 +805,14 @@ void inserir_B(Registro reg, int RRN_reg, bPool *bp){
                 n[novRaiz] = 0
                 p1[novaRaiz] = raiz(antiga)
                 SPLIT(novaRaiz, 5, raiz(antiga))
-                B-TREE-INSERT-NONFULL(raiz, k)
+                swapPosição(raiz(antiga), novaRaiz)
+                B-TREE-INSERT-NONFULL(novaRaiz, k)
             }
             else B-TREE-INSERT-NONFULL(raiz, k)
     }
     */
+
+   //if(bPool->node[0])   
 }
 
 int ordena_no_B(arvoreB *node, Registro reg, int qtd){
@@ -1062,7 +1063,8 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             }
 
             //Escreve a página no arquivo de índice
-            flush(bPool->node[pos], bPool->RRN[pos], bPool);
+            flush(bufPool->node[pos], bufPool->RRN[pos], bufPool);
+
             //Troca a página menos frequentada
             bufPool->node[pos].n = page->n;
             for(j = 0;j < 9;j++){
@@ -1072,7 +1074,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             }
             bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[pos] = 1;                           //Primeiro acesso
-            buffPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
+            bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
         }
     }
 }
@@ -1081,10 +1083,11 @@ void flush_full(bPool* bufPool){
     //Escrever no disco todas as paginas com modificacoes presentes no buffer
 }
 
-void flush(arvoreB* page, int RRN, bPool* bufPool){
+void flush(arvoreB page, int RRN, bPool* bufPool){
     //Escrever no disco uma pagina que foi modificada
     //Sempre chamada durante a realizacao as trocas de pagina a serem armazenadas no buffer
     FILE *b;
+    int i;
     char status = 0;
 
     b = fopen("arvoreB.bin", "w+b");
@@ -1097,13 +1100,13 @@ void flush(arvoreB* page, int RRN, bPool* bufPool){
     fseek(b, RRN*TAM_NO_INDICE + sizeof(Cabecalho_B) - 1, SEEK_SET);
 
     //Armazena a pagina a ser trocada do buffer no arquivo
-    fwrite(&page->n, sizeof(int), 1, b);
-    for(int i = 0; i < 9; i++){
-      fwrite(&page->p[i], sizeof(int), 1, b);
-      fwrite(&page->c[i], sizeof(int), 1, b);
-      fwrite(&page->pr[i], sizeof(int), 1, b);
+    fwrite(&page.n, sizeof(int), 1, b);
+    for(i = 0; i < 9; i++){
+      fwrite(&page.p[i], sizeof(int), 1, b);
+      fwrite(&page.c[i], sizeof(int), 1, b);
+      fwrite(&page.pr[i], sizeof(int), 1, b);
     }
-    fwrite(&page->pr[i], sizeof(int), 1, b);    //Ultimo ponteiro (n+1)
+    fwrite(&page.pr[i], sizeof(int), 1, b);    //Ultimo ponteiro (n+1)
 
     //Altera os status
     status = 1;

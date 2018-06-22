@@ -109,6 +109,6 @@ void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg, bPool *bp);
 arvoreB *get(int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
 void put(int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
 void flush_full(bPool *bufPool);                        //Manda todas as páginas pro arquivo
-void flush(arvoreB *page, bPool *bufPool);              //Manda uma página específica pro arquivo
+void flush(arvoreB page, int RRN, bPool *bufPool);              //Manda uma página específica pro arquivo
 
 #endif
