@@ -946,7 +946,7 @@ arvoreB* get(int RRN, bPool *bufPool){
 
     //if esta no bufferpool
         //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
-        //2: realize possíveis restruturações na organização do buffer (LFU)
+        //2: realize possíveis reestruturações na organização do buffer (LFU)
         //3: retorne P
 
     //else nao esta no buffer
@@ -1062,7 +1062,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             }
 
             //Escreve a página no arquivo de índice
-            //flush(bPool->node[j], bPool);
+            flush(bPool->node[pos], bPool->RRN[pos], bPool);
             //Troca a página menos frequentada
             bufPool->node[pos].n = page->n;
             for(j = 0;j < 9;j++){
@@ -1070,8 +1070,9 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
                 bufPool->node[pos].c[j] = page->c[j];
                 bufPool->node[pos].pr[j] = page->pr[j];
             }
-            bufPool->node[isVazio].p[j] = page->p[j];               //Copia o último ponteiro (n+1)
-            bufPool->freq[isVazio] = 1;                             //Primeiro acesso
+            bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+            bufPool->freq[pos] = 1;                           //Primeiro acesso
+            buffPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
         }
     }
 }
@@ -1080,7 +1081,34 @@ void flush_full(bPool* bufPool){
     //Escrever no disco todas as paginas com modificacoes presentes no buffer
 }
 
-void flush(arvoreB* page, bPool* bufPool){
+void flush(arvoreB* page, int RRN, bPool* bufPool){
     //Escrever no disco uma pagina que foi modificada
     //Sempre chamada durante a realizacao as trocas de pagina a serem armazenadas no buffer
+    FILE *b;
+    char status = 0;
+
+    b = fopen("arvoreB.bin", "w+b");
+
+    //Altera os status
+    fseek(b, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, b);
+
+    //move o ponteiro para o nó desejado
+    fseek(b, RRN*TAM_NO_INDICE + sizeof(Cabecalho_B) - 1, SEEK_SET);
+
+    //Armazena a pagina a ser trocada do buffer no arquivo
+    fwrite(&page->n, sizeof(int), 1, b);
+    for(int i = 0; i < 9; i++){
+      fwrite(&page->p[i], sizeof(int), 1, b);
+      fwrite(&page->c[i], sizeof(int), 1, b);
+      fwrite(&page->pr[i], sizeof(int), 1, b);
+    }
+    fwrite(&page->pr[i], sizeof(int), 1, b);    //Ultimo ponteiro (n+1)
+
+    //Altera os status
+    status = 1;
+    fseek(b, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, b);
+
+    fclose(b);
 }
