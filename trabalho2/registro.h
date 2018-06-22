@@ -65,10 +65,10 @@ void busca_rrn_parametro(char* campo, char* valor);
 
  //Definindo o cabecalho do arquivo de arvore B
  typedef struct{
-      char status;
       int noRaiz;
       int altura;
       int ultimoRRN;
+      char status;
  } Cabecalho_B;
 
  /*

@@ -724,7 +724,7 @@ void busca_rrn_parametro(char* campo, char* valor){
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
 
-    //Criando o arquivo de dados chamado de (teste.bin)
+    //Criando o arquivo de indices chamado de (arvoreB.bin)
     b = fopen("arvoreB.bin", "wb");
     verifica_arquivo(b, CARREGANDO);
 
@@ -734,7 +734,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
     return b;
 }
 
-//Funcao para criar o cabealho no arquivo de arvore B
+//Funcao para carregar o arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
     FILE *b;
     bPool *bp;  //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
@@ -985,7 +985,7 @@ arvoreB* get(int RRN, bPool *bufPool){
         //Pulando o cabeçalho
         fseek(b, TAM_CAB_INDICE, SEEK_SET);
         //Indo pro RRN desejado
-        fseek(b, RRN, SEEK_CUR);
+        fseek(b, RRN*TAM_NO_INDICE, SEEK_CUR);
 
         //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
         fread(&aux->n, 1, sizeof(int), b);
@@ -1012,7 +1012,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
         //3: caso contrário : remova uma página N do buffer e insira P (LFU)
 
     //else se esta no buffer
-        //1: recuper e a página armazenada no buffer e atualize seu conteúdo
+        //1: recupere a página armazenada no buffer e atualize seu conteúdo
         //2: marque que P é uma página modificada
         //3: reorganize a estrutura interna do buffer (LFU)
 
