@@ -102,14 +102,14 @@ typedef struct{
 FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
-int ordena_no_B(arvoreB *node, Registro reg, int qtd);
-void insere_naoCheio_B(arvoreB* x, Registro reg, int RRN_reg, bPool *bp);
+void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp);
+void split_B(FILE *b, arvoreB pai, int RRN_pai, int meio, arvoreB filhoCheio, int RRN_filhoCheio);
 
 //Buffer pool
-int get(int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
-int put(int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
+int get(FILE *b, int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
+int put(FILE *b, int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
 void flush_full(bPool *bufPool);                        //Manda todas as páginas pro arquivo
-void flush(arvoreB page, int RRN, bPool *bufPool);      //Manda uma página específica pro arquivo
+void flush(FILE *b, arvoreB page, int RRN, bPool *bufPool);      //Manda uma página específica pro arquivo
 void printa_bPool(bPool* bp);                           //Printa o bufferpool inteiro
 
 #endif
