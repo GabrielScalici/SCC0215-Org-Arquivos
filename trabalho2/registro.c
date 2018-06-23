@@ -757,10 +757,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fwrite(&cab.noRaiz,sizeof(int),1,b);
     fwrite(&cab.altura,sizeof(int),1,b);
     fwrite(&cab.ultimoRRN,sizeof(int),1,b);
-    printf("cab.status %c\n", cab.status);
+    /*printf("cab.status %c\n", cab.status);
     printf("cab.noRaiz %d\n", cab.noRaiz);
     printf("cab.altura %d\n", cab.altura);
-    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
+    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);*/
 
     //Inicializando a ArvoreB
     root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
@@ -781,7 +781,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < 9; i++){
         inserir_B(b, reg[i], i, bp); 
     }
 
@@ -835,12 +835,13 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   if(cab.noRaiz == -1){
     //printf("antes do buffer\n");
     //volta para o inicio pulando o status
-    fseek(b, 1, SEEK_SET);
+    fseek(b, 0, SEEK_SET);
+    fread(&cab.status, sizeof(char), 1, b);
     //atualiza o no raiz
     cab.noRaiz = 0;
     fwrite(&cab.noRaiz, sizeof(int), 1, b);
     //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
-    fseek(b, sizeof(int), SEEK_CUR);
+    fread(&cab.altura, sizeof(int), 1, b);
     //atualiza ultimoRRN
     cab.ultimoRRN = 0;
     fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
@@ -897,9 +898,12 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //Insere nova chave
     //insere_naoCheio_B(cab.noRaiz, reg, RRN_reg, bp);
 
-    fclose(b);
+    //fclose(b);
   }
-  //else insere_naoCheio_B(cab.noRaiz, reg, RRN_reg, bp);   
+  else{
+    bp->freq[0]++;
+    insere_naoCheio_B(&bp->node[0], reg, RRN_reg, bp);   
+  } 
 }
 
 int ordena_no_B(arvoreB *node, Registro reg, int qtd){
@@ -923,31 +927,61 @@ int ordena_no_B(arvoreB *node, Registro reg, int qtd){
     return i;
 }
 
-void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg, bPool *bp){
+void insere_naoCheio_B(arvoreB* x, Registro reg, int RRN_reg, bPool *bp){
   /*
   B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-        i = n[x]
-        if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
-        while(i>=0 && k<ci[x]){
-            ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
-            i--
-        }
-        ci+1[x] = k
-        n[x]++
-        }
-        else{
-        while(i>=0 && k<ci[x])
-            i--
-        i++
-        FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
-        if(n[pi[x]] == 9){
-            SPLIT(x, i+1, pi[x])
-            if(k > ci[x]) i++ (?)
-        }
-        B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
-        }
+        - get(no) //através do RRN
+        - i = n[x]
+        - if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
+        - while(i>=0 && k<ci[x]){
+        -   ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
+        -   i--
+        - }
+        - ci+1[x] = k
+        - n[x]++
+        - }
+        - else{
+        - while(i>=0 && k<ci[x])
+        -   i--
+        - i++
+        - FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
+        - if(n[pi[x]] == 9){
+        -   SPLIT(x, i+1, pi[x])
+        -   if(k > ci[x]) i++ (?)
+        - }
+        - B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
+        - }
     }
   */
+  int pos, posBuffer;
+  pos = x->n - 1;
+
+  //checa se x é um no folha
+  if(x->p[0] == -1){
+    while(pos>=0 && reg.codINEP < x->c[pos]){ //insere a nova chave ordenadamente
+      x->c[pos+1] = x->c[pos];
+      x->pr[pos+1] = x->pr[pos];
+      pos--;
+    }
+    x->c[pos+1] = reg.codINEP;
+    x->pr[pos+1] = RRN_reg;
+    x->n++;
+  }
+  else{ //Se x não for uma  folha
+    while(pos >= 0 && reg.codINEP < x->c[pos])
+      pos--;
+    pos++;
+
+    //Faz um get no filho desejado
+    posBuffer = get(x->p[pos], bp);
+
+    //Após ter a posição do filho no buffer, verifica se ele está cheio
+    if(bp->node[posBuffer].n == 9){
+      //split_B(x, pos+1, bp->node[posBuffer]);
+      if(reg.codINEP > x->c[pos]) pos++;
+    }
+    insere_naoCheio_B(&bp->node[posBuffer], reg, RRN_reg, bp);
+  }
 }
 
 //Funcao de split para a insercao na arvore B
@@ -1030,7 +1064,7 @@ void pesquisa_B(){
  * BUFFER POOL
  */
 
-arvoreB* get(int RRN, bPool *bufPool){
+int get(int RRN, bPool *bufPool){
 
     //if esta no bufferpool
         //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
@@ -1043,7 +1077,7 @@ arvoreB* get(int RRN, bPool *bufPool){
         //3: retorne P.
 
     arvoreB *aux;
-    int i, j;
+    int i, j, resp;
     FILE *b;
 
     aux = (arvoreB *) calloc(1, sizeof(arvoreB));
@@ -1061,7 +1095,7 @@ arvoreB* get(int RRN, bPool *bufPool){
             aux->p[j] = bufPool->node[i].p[j];          //Copia o último ponteiro (n+1)
             bufPool->freq[i]++;                         //Atualiza a frequência
 
-            break;                                      //Sai do for()
+            return i;                                   //Sai do for() e retorna o indice do buffer
         }
     }
 
@@ -1085,15 +1119,15 @@ arvoreB* get(int RRN, bPool *bufPool){
         fread(&aux->p[i], 1, sizeof(int), b);           //Copia o ultimo ponteiro (n+1)
 
         //Coloca no buffer
-        put(RRN, aux, bufPool);
+        resp = put(RRN, aux, bufPool);
     }
 
-    return aux;
+    return resp;
 
 }
 
-void put(int RRN, arvoreB *page, bPool *bufPool){
-  printf("entrou\n");
+int put(int RRN, arvoreB *page, bPool *bufPool){
+    printf("RRN = %d\n", RRN);
     //if nao esta no buffer POOL
         //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
@@ -1105,7 +1139,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
         //3: reorganize a estrutura interna do buffer (LFU)
 
     int i, j;
-    int isVazio = 0;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
+    int isVazio = -1;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
     //Variáveis pra localizar o menos utilizado (LFU)
     int menor = INT_MAX;      
     int pos = -1;
@@ -1114,7 +1148,7 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
-        if(bufPool->freq[i] == 0 && isVazio == 0)    isVazio = i;    
+        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
         if(bufPool->RRN[i] == RRN){
             for(j = 0;j < 9;j++){
                 bufPool->node[i].p[j] = page->p[j];
@@ -1124,14 +1158,14 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             bufPool->node[i].p[j] = page->p[j];         //Copia o último ponteiro (n+!)
             bufPool->freq[i]++;                         //Atualiza a frequencia
 
-            break;                                      //Sai do for()
+            return i;                                   //Sai do for() e retorna a posição no buffer
         }
     }
 
     //Página não está no buffer
     //Verifica se percorreu todo o buffer
-    if(i == TAM_BUFFER){     
-        if(isVazio != 0){
+    if(i == TAM_BUFFER){
+        if(isVazio != -1){
             //Copia a árvore pro buffer
             bufPool->node[isVazio].n = page->n;
             for(j = 0;j < 9;j++){
@@ -1140,9 +1174,11 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
                 bufPool->node[isVazio].pr[j] = page->pr[j];
             }
             bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+            
+            return isVazio;
         }else{
-            //Acha a página menos frequentada
-            for(j = 0;j < TAM_BUFFER;j++){
+            //Acha a página menos frequentada tirando a raiz
+            for(j = 1;j < TAM_BUFFER;j++){
                 if(bufPool->freq[j] < menor){
                     menor = bufPool->freq[i];
                     pos = j;
@@ -1162,8 +1198,10 @@ void put(int RRN, arvoreB *page, bPool *bufPool){
             bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[pos] = 1;                           //Primeiro acesso
             bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
-        }
+        } 
     }
+
+    return pos;
 }
 
 void flush_full(bPool* bufPool){

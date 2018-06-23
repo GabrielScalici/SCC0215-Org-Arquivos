@@ -103,11 +103,11 @@ FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
 int ordena_no_B(arvoreB *node, Registro reg, int qtd);
-void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg, bPool *bp);
+void insere_naoCheio_B(arvoreB* x, Registro reg, int RRN_reg, bPool *bp);
 
 //Buffer pool
-arvoreB *get(int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
-void put(int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
+int get(int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
+int put(int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
 void flush_full(bPool *bufPool);                        //Manda todas as páginas pro arquivo
 void flush(arvoreB page, int RRN, bPool *bufPool);      //Manda uma página específica pro arquivo
 void printa_bPool(bPool* bp);                           //Printa o bufferpool inteiro
