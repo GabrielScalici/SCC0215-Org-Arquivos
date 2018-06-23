@@ -767,12 +767,13 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     //Inicializando a ArvoreB
     root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
     tamAtual++; //=1
-    root[0].n = 0;
+    root->n = 0;
     for(i = 0;i < 9;i++){
-        root[0].p[i] = -1;
-        root[0].c[i] = -1;
-        root[0].pr[i] = -1;
+        root->p[i] = -1;
+        root->c[i] = -1;
+        root->pr[i] = -1;
     }
+    root->pr[i] = -1;
 
     //Inicializando o buffer pool
     bp = (bPool *) calloc(1, sizeof(bPool));
@@ -811,8 +812,99 @@ void inserir_B(Registro reg, int RRN_reg, bPool *bp){
             else B-TREE-INSERT-NONFULL(raiz, k)
     }
     */
+  FILE *b;
+  int i;
+  Cabecalho_B cab;
 
-   //if(bPool->node[0])   
+  b = fopen("arvoreB.bin", "r+b");
+  fseek(b, 0, SEEK_SET);
+  //TUDO CABEÇALHO
+  //Alterar o status
+  cab.status = '0';
+  fwrite(&cab.status, sizeof(char), 1, b);
+  //printf("status %c\n", status);
+
+  //Lendo o no raiz
+  fread(&cab.noRaiz, sizeof(int), 1, b);
+  //printf("rrn_no_raiz %d\n", rrn_no_raiz);
+
+  //Lendo a altura da arvore
+  fread(&cab.altura, sizeof(int), 1, b);
+  //printf("altura_B %d\n", altura_B);
+
+  //Lendo o ultimo RRN da arvore
+  fread(&cab.ultimoRRN, sizeof(int), 1, b);
+  //printf("lastRRN %d\n", lastRRN);
+
+  //Se a arvore estiver vazia
+  if(cab.noRaiz == -1){
+    //volta para o inicio pulando o status
+    fseek(b, 1, SEEK_SET);
+    //atualiza o no raiz
+    cab.noRaiz = 0;
+    fwrite(&cab.noRaiz, sizeof(int), 1, b);
+    //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
+    fseek(b, sizeof(int), SEEK_CUR);
+    //atualiza ultimoRRN
+    cab.ultimoRRN = 0;
+    fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+    //aloca a raiz
+    arvoreB* raiz = (arvoreB *) calloc(1, sizeof(arvoreB));
+    raiz->n = 0;
+    for(i = 0;i < 9;i++){
+        raiz->p[i] = -1;
+        raiz->c[i] = -1;
+        raiz->pr[i] = -1;
+    }
+    raiz->pr[i] = -1;
+
+    //Insere nova chave
+    raiz->c[0] = reg.codINEP;
+    raiz->pr[0] = RRN_reg;
+
+
+    //Coloca no buffer
+    put(cab.ultimoRRN, raiz, bp);
+  }
+  else if(bp->node[0].n == 9){  //Checa no buffer se a raiz está cheia
+    //aloca novaRaiz
+    arvoreB* novaRaiz = (arvoreB *) calloc(1, sizeof(arvoreB));
+    novaRaiz->n = 0;
+    for(i = 0;i < 9;i++){
+        novaRaiz->p[i] = -1;
+        novaRaiz->c[i] = -1;
+        novaRaiz->pr[i] = -1;
+    }
+    novaRaiz->pr[i] = -1;
+
+    //Coloca raiz antiga como filha
+    novaRaiz->p[0] = bp->RRN[0];
+
+    //Alterando o cabeçalho do arquivo por causa da nova raiz
+    fseek(b, 1, SEEK_SET);
+    //atualiza o no raiz
+    cab.noRaiz = cab.ultimoRRN + 1;
+    fwrite(&cab.noRaiz, sizeof(int), 1, b);
+    //atualiza a altura
+    cab.altura++;
+    fwrite(&cab.altura, sizeof(int), 1, b);
+    //atualiza ultimoRRN
+    cab.ultimoRRN++;
+    fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+    //aplica o split da raiz antiga
+    //split_B(novaRaiz, 5, bp->node[0], bPool* bp);
+
+    //Coloca a novaRaiz no slot 0 do buffer
+    //swapPosição(raiz(antiga), novaRaiz)
+
+    //Insere nova chave
+    //insere_naoCheio_B(cab.noRaiz, reg, RRN_reg, bp);
+
+    fclose(b);
+  }
+  else //insere_naoCheio_B(cab.noRaiz, reg, RRN_reg, bp);   
 }
 
 int ordena_no_B(arvoreB *node, Registro reg, int qtd){
