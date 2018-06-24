@@ -738,13 +738,18 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
 
 //Funcao para carregar o arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
-    FILE *b;
-    bPool *bp;  //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
+    FILE *b;        //Arquivo da árvore B 
+    FILE *fp;       //Arquivo de buffer-info
+    bPool *bp;      //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
     arvoreB *root = NULL;
     int tamAtual = 0;       //Numero de nós na árvore
     int i, j = 0;
 
     b = fopen("arvoreB.bin", "w+b");
+
+    //Inicializando as variáveis auxiliares
+    hit = 0;
+    fault = 0;
 
     //Cria um cabecalho auxiliar
     Cabecalho_B cab;
@@ -788,6 +793,11 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
         inserir_B(b, reg[i], i, bp); 
     }
 
+    //Grava o arquivo de infos
+    fp = fopen("buffer-info.text", "a");
+    fprintf(fp, "Page fault: %d; Page hit: %d. \n", fault, hit);
+    fclose(fp);
+
     printa_bPool(bp);
 
     fclose(b);
@@ -811,11 +821,6 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     */
   int i;
   Cabecalho_B cab;
-  FILE *fp;             //Arquivo buffer-info
-
-    //Inicializa as variáveis auxiliares
-    hit = 0;
-    fault = 0;
 
   fseek(b, 0, SEEK_SET);
   //TUDO CABEÇALHO
@@ -908,9 +913,6 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     bp->freq[0]++;
     insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
   } 
-
-    fp = fopen("buffer-info.text", "a");
-    fprintf(fp, "Page fault: %d; Page hit: %d.\n", fault, hit);
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
