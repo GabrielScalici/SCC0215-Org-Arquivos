@@ -14,7 +14,8 @@ enum options{
 	COMPACTA = 8,
 	RECUPERAREMOVIDOS = 9,
 	INSERIR_ARQ_INDICE = 10,
-  	INSERIR_INDICE = 11
+  	INSERIR_INDICE = 11,
+	BUSCA_INDICE = 12
 };
 
 int main(int argc, char *argv[]){
@@ -149,30 +150,48 @@ int main(int argc, char *argv[]){
 
 			break;
 		}
-    case(INSERIR_INDICE):{
-      int cod = atoi(argv[2]);
-      char* data = argv[3];
-      char* uf = argv[4];
-      char* nome_esc = argv[5];
-      char* muni = argv[6];
-      char* prest = argv[7];
+		case(INSERIR_INDICE):{
+			int cod = atoi(argv[2]);
+			char* data = argv[3];
+			char* uf = argv[4];
+			char* nome_esc = argv[5];
+			char* muni = argv[6];
+			char* prest = argv[7];
 
-      Registro reg;
-      reg.codINEP = cod;
-      strcpy(reg.dataAtiv, data);
-      strcpy(reg.uf, uf);
-      strcpy(reg.nomEscola, nome_esc);
-      strcpy(reg.municipio, muni);
-      strcpy(reg.prestadora, prest);
+			Registro reg;
+			reg.codINEP = cod;
+			strcpy(reg.dataAtiv, data);
+			strcpy(reg.uf, uf);
+			strcpy(reg.nomEscola, nome_esc);
+			strcpy(reg.municipio, muni);
+			strcpy(reg.prestadora, prest);
 
-      //Insere no arquivo de dados
-      int pos = inserir_registro(cod, data, uf, nome_esc, muni, prest);
+			//Insere no arquivo de dados
+			int pos = inserir_registro(cod, data, uf, nome_esc, muni, prest);
 
-      b = fopen("arvoreB.bin", "w+b");
+			b = fopen("arvoreB.bin", "w+b");
 
-      //Insere no arquivo de indice
-      inserir_B(b, reg, pos, bp);
-    }
+			//Insere no arquivo de indice
+			inserir_B(b, reg, pos, bp);
+			break;
+		}
+		case(BUSCA_INDICE):{
+			bPool *bp;
+			FILE *b;
+
+			//Inicializando buffer-pool
+			bp = (bPool *) calloc(1, sizeof(bPool));
+			for(int i = 0;i < TAM_BUFFER;i++){
+				bp->RRN[i] = -1;
+				bp->freq[i] = 0;
+			}
+
+			//Abrindo o arquivo de índices
+			b = fopen("arvoreB.bin", "r+b");
+			if(b == NULL)	return -1;
+
+			break;
+		}
 	}
 
 	return 0;
