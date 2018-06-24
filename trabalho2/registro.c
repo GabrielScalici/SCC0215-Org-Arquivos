@@ -1041,7 +1041,7 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   new->n = 4;
 
   //ordena os ponteiros do no pai até o espaco do novo ponteiro
-  printf("pai->n = %d || pont+1 = %d\n", pai->n, pont+1);
+  //printf("pai->n = %d || pont+1 = %d\n", pai->n, pont+1);
   for(i = pai->n; i >= pont+1; i--)
     pai->p[i+1] = pai->p[i];
 
@@ -1061,9 +1061,12 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   pai->n++;
 
   //insere os nos alterados no buffer
+  printf("RRNfilhoCheio - ");
   put(b, RRN_filhoCheio, filhoCheio, bp);
-  put(b, cab.ultimoRRN, new, bp);
+  printf("pai - ");
   put(b, RRN_pai, pai, bp);
+  printf("novo - ");
+  put(b, cab.ultimoRRN, new, bp);
 }
 
 void pesquisa_B(){
@@ -1205,7 +1208,8 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
         if(isVazio != -1){
-            //Copia a árvore pro buffer
+            printf("isVazio = %d\n", isVazio);
+            //Copia a pagina pro buffer
             bufPool->node[isVazio].n = page->n;
             for(j = 0;j < 9;j++){
                 bufPool->node[isVazio].p[j] = page->p[j];
@@ -1213,8 +1217,8 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
                 bufPool->node[isVazio].pr[j] = page->pr[j];
             }
             bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
-            //bufPool->freq[pos] = 1;
-            //bufPool->RRN[pos] = RRN;
+            bufPool->freq[isVazio] = 1;
+            //bufPool->RRN[isVazio] = RRN;
 
             return isVazio;
         }else{
