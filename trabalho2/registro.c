@@ -4,7 +4,7 @@
  *  NOMES:                      NUMERO USP
  *  GABRIEL SCALICI             9292970
  *  RODRIGO NOVENTA JR          9791243
- *	EDUARDO ALVES BARATELA      10295270
+ *  EDUARDO ALVES BARATELA      10295270
  *  MATEUS VIRGINIO SILVA       10284156
  *
  */
@@ -81,7 +81,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
                 reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
-           		strncpy(reg[qtd].dataAtiv, carac,10);
+              strncpy(reg[qtd].dataAtiv, carac,10);
                 alternando=2;
             }
             else if(alternando == 2){//colocando no campo de codINEP
@@ -109,19 +109,19 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
         }
         else {
-        	if(alternando == 1 && carac[0]== '\0'){
-        		reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
-        		strncpy(reg[qtd].dataAtiv,"0000000000",10);
-        	}
+          if(alternando == 1 && carac[0]== '\0'){
+            reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
+            strncpy(reg[qtd].dataAtiv,"0000000000",10);
+          }
             else if(alternando == 5 && carac[0]== '\0'){
                 reg[qtd].uf = (char*) malloc(sizeof(char)*2);
-            	strncpy(reg[qtd].dataAtiv,"00",2);
+              strncpy(reg[qtd].dataAtiv,"00",2);
             }
             else if(alternando == 0)reg[qtd].tam_prestadora = 0;
             else if(alternando == 3)reg[qtd].tamEscola = 0;
             else if(alternando == 4)reg[qtd].tam_municipio = 0;
-         	alternando++;  //se houver um campo sem informacao pula para o proximo campo
-		}
+          alternando++;  //se houver um campo sem informacao pula para o proximo campo
+    }
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
             i = 0;
@@ -175,11 +175,10 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
         printf("%s ", reg[i].municipio);
         printf("%d-", reg[i].tam_prestadora);
         printf("%s \n", reg[i].prestadora);
-
        */
         tamAtual = (((28 + reg[i].tamEscola) + reg[i].tam_municipio) + reg[i].tam_prestadora);
         if(tamAtual < TAM_REG){
-        	for(int i =0; i< (TAM_REG - tamAtual);i++)fwrite(&c,sizeof(char),1,f);
+          for(int i =0; i< (TAM_REG - tamAtual);i++)fwrite(&c,sizeof(char),1,f);
         }
        // fwrite(&reg[i],TAM_REG, 1, f);
     }
@@ -618,101 +617,101 @@ void busca_rrn_parametro(char* campo, char* valor){
     verifica_arquivo(f, RECUPERANDO);    //Verifica se carregou o arquivo
     printf("Arquivo aberto\n");
 
-	fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+  fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
 
 
-	if(strcmp(campo, "codINEP")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+  if(strcmp(campo, "codINEP")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
 
-      	 	//Andando pelo registro até chegar no campo codINEP
-      	 	fseek(f,(i*87),SEEK_CUR);
+          //Andando pelo registro até chegar no campo codINEP
+          fseek(f,(i*87),SEEK_CUR);
 
-		    if(cod == atoi(valor))busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "dataAtiv")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-		    if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+4),SEEK_CUR);
+        if(cod == atoi(valor))busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "dataAtiv")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+        if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+4),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo dataAtiv
-          	fread(data, sizeof(char), 10, f);
+          //Andando pelo registro até chegar no campo dataAtiv
+            fread(data, sizeof(char), 10, f);
 
-		    if(strcmp(data,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "uf")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+14),SEEK_CUR);
+        if(strcmp(data,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "uf")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+14),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo UF
-	        fread(uf, sizeof(char), 2, f);
+          //Andando pelo registro até chegar no campo UF
+          fread(uf, sizeof(char), 2, f);
 
-		    if(strcmp(uf,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "nomeEscola")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-		    if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+16),SEEK_CUR);
+        if(strcmp(uf,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "nomeEscola")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+        if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+16),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo nomeEscola
-          	fread(&tam_escola, sizeof(int), 1, f);
-          	nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
-    	    nome_escola[tam_escola] = '\0';
-    	    fread(nome_escola, tam_escola, 1, f);
+          //Andando pelo registro até chegar no campo nomeEscola
+            fread(&tam_escola, sizeof(int), 1, f);
+            nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
+          nome_escola[tam_escola] = '\0';
+          fread(nome_escola, tam_escola, 1, f);
 
-		    if(strcmp(nome_escola,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "municipio")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+16),SEEK_CUR);
+        if(strcmp(nome_escola,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "municipio")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+16),SEEK_CUR);
 
-          	//Andando pelo registro até chegar no campo municipio
-          	fread(&tam_escola, sizeof(int), 1, f);
-          	fseek(f,tam_escola,SEEK_CUR);
-          	fread(&tam_mun, sizeof(int), 1, f);
-          	muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
-          	muni[tam_mun] = '\0';
-         	fread(muni, tam_mun, 1, f);
+            //Andando pelo registro até chegar no campo municipio
+            fread(&tam_escola, sizeof(int), 1, f);
+            fseek(f,tam_escola,SEEK_CUR);
+            fread(&tam_mun, sizeof(int), 1, f);
+            muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
+            muni[tam_mun] = '\0';
+          fread(muni, tam_mun, 1, f);
 
-		    if(strcmp(muni,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		  	i++;
-		}
-	}
-	else if(strcmp(campo, "prestadora")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,(i*87)+16,SEEK_CUR);
+        if(strcmp(muni,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "prestadora")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,(i*87)+16,SEEK_CUR);
 
-          	//Andando pelo registro até chegar no campo prestadora
-          	fread(&tam_escola, sizeof(int), 1, f);
-			fseek(f,tam_escola,SEEK_CUR);
-          	fread(&tam_mun, sizeof(int), 1, f);
-          	fseek(f,tam_mun,SEEK_CUR);
-          	fread(&tam_prest, sizeof(int), 1, f);
-          	prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
-          	prest[tam_prest] = '\0';
-          	fread(prest, tam_prest, 1, f);
+            //Andando pelo registro até chegar no campo prestadora
+            fread(&tam_escola, sizeof(int), 1, f);
+      fseek(f,tam_escola,SEEK_CUR);
+            fread(&tam_mun, sizeof(int), 1, f);
+            fseek(f,tam_mun,SEEK_CUR);
+            fread(&tam_prest, sizeof(int), 1, f);
+            prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
+            prest[tam_prest] = '\0';
+            fread(prest, tam_prest, 1, f);
 
-		    if(strcmp(prest,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
+        if(strcmp(prest,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
 
     fclose(f);  //Fecha o arquivo
 }
@@ -782,8 +781,8 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 20; i++){
-      inserir_B(b, reg[i], i, bp); 
+    for(int i = 0; i < 10; i++){
+        inserir_B(b, reg[i], i, bp); 
     }
 
     printa_bPool(bp);
@@ -794,11 +793,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   /*
     Pseudocódigo Cormen:
-
     B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
             if(n[raiz]==9){
-                aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
-                cab.raiz = novaRaiz	//atualiza o cabeçalho
+                aloca novaRaiz  //no nosso caso seria achar o proximo espaço vazio no arquivo
+                cab.raiz = novaRaiz //atualiza o cabeçalho
                 n[novRaiz] = 0
                 p1[novaRaiz] = raiz(antiga)
                 SPLIT(novaRaiz, 0, raiz(antiga))
@@ -900,9 +898,8 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   }
   else{
     bp->freq[0]++;
-    insere_naoCheio_B(b, &bp->node[1], cab.noRaiz, reg, RRN_reg, bp);   
+    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
   } 
-
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
@@ -968,33 +965,27 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   SPLIT(no pai, i, no filhoCheio){
          - aloca novoNo //aloca no ultimoRRN+1
          - n[novoNo] = 4
-
          - for(j = 0; j++; j<4){
          -   cj[novoNo] = cj+5[filhoCheio]
          -   prj[novoNo] = prj+5[filhoCheio]
          - }
-
          - if(p0[filhoCheio] != -1){ //checa se nao é no folha
          -   for(j=0; j++; j<5)
          -     pj[novoNo] = pj+5[filhoCheio]
          - }
          - n[filhoCheio] = 4
-
          - for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
          -   pj+1[pai] = pj[pai]
          - }
          - //atençao que é i e nao j aqui embaixo
          - pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
-
          - for(j = n[pai]-1; j--; j<i){
          -   cj+1[pai] = cj[pai]
          -   prj+1[pai] = prj[pai]
          - }
           ci[pai] = c4[filhoCheio]
           pri[pai] = pr4[filhoCheio]
-
           n[pai]++
-
           put(filhoCheio)
           put(novoNo)
           put(pai)
@@ -1068,17 +1059,14 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   put(b, RRN_pai, pai, bp);
   //printf("RRNnovo no split -  %d", cab.ultimoRRN);
   put(b, cab.ultimoRRN, new, bp);
-  printf("\n\nPOS SPLIT \n\n");
 }
 
 void pesquisa_B(){
   /*
     PESQUISA(no x, int k){
       int i = 0
-
       FSEEK PULANDO CABECALHO
       FSEEK x*TAMANHO_INDICE
-
       fread(n[x])
       fread[p[0]]
       fread(c[0])
@@ -1090,12 +1078,10 @@ void pesquisa_B(){
         fread(pr[i])
       }
       fread[p[i]]
-
       if(i<n[x] && k == c[i]){
         busca(c[i] ou pr[i]) //busca essa chave no arquivo de dados
         return
       }
-
       if(p[0] == -1){
         printf(nao encontrado)
         return
@@ -1171,7 +1157,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
 }
 
 int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
-    printf("RRN do put = %d\n", RRN);
+    printf("RRN = %d\n", RRN);
     //if nao esta no buffer POOL
         //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
