@@ -103,7 +103,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp);
-void split_B(FILE *b, arvoreB pai, int RRN_pai, int meio, arvoreB filhoCheio, int RRN_filhoCheio);
+void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio);
 
 //Buffer pool
 int get(FILE *b, int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó

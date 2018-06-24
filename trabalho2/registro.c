@@ -747,7 +747,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
 
     //Cria um cabecalho auxiliar
     Cabecalho_B cab;
-    cab.status = '1';           //consistente
+    cab.status = '0';           //consistente
     cab.noRaiz = -1;            //Arvore vazia por enquanto
     cab.altura = 0;
     cab.ultimoRRN = -1;
@@ -801,7 +801,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
                 cab.raiz = novaRaiz	//atualiza o cabeçalho
                 n[novRaiz] = 0
                 p1[novaRaiz] = raiz(antiga)
-                SPLIT(novaRaiz, 5, raiz(antiga))
+                SPLIT(novaRaiz, 0, raiz(antiga))
                 swapPosição(raiz(antiga), novaRaiz)
                 B-TREE-INSERT-NONFULL(novaRaiz, k)
             }
@@ -889,14 +889,14 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
 
     //aplica o split da raiz antiga
-    //split_B(b, novaRaiz, cab.noRaiz, 5, bp->node[0], bp->RRN[0], bPool* bp);
+    split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
 
     //Coloca a novaRaiz no slot 0 do buffer
     //swapPosição(raiz(antiga), novaRaiz)
 
     //Insere nova chave
-    //bp->freq[0]++;
-    //insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
+    bp->freq[0]++;
+    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
   }
   else{
     bp->freq[0]++;
@@ -923,7 +923,7 @@ void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int R
         - i++
         - FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
         - if(n[pi[x]] == 9){
-        -   SPLIT(x, RRN_indiceX, i+1, pi[x])
+        -   SPLIT(b, bp, x, RRN_indiceX, i, pi[x])
         -   if(k > ci[x]) i++ (?)
         - }
         - B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
@@ -954,7 +954,7 @@ void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int R
 
     //Após ter a posição do filho no buffer, verifica se ele está cheio
     if(bp->node[posBuffer].n == 9){
-      //split_B(x, RRN_indiceX, pos+1, bp->node[posBuffer], br->RRN[posBuffer]);
+      split_B(b, bp, x, RRN_indiceX, pos, &bp->node[posBuffer], bp->RRN[posBuffer]);
       if(reg.codINEP > x->c[pos]) pos++;
     }
     insere_naoCheio_B(b, &bp->node[posBuffer], bp->RRN[posBuffer], reg, RRN_reg, bp);
@@ -962,45 +962,54 @@ void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int R
 }
 
 //Funcao de split para a insercao na arvore B
-void split_B(FILE *b, arvoreB pai, int RRN_pai, int meio, arvoreB filhoCheio, int RRN_filhoCheio){
+void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio){
   /*
   SPLIT(no pai, i, no filhoCheio){
-         aloca novoNo //aloca no ultimoRRN+1
-          n[novoNo] = 4
+         - aloca novoNo //aloca no ultimoRRN+1
+         - n[novoNo] = 4
 
-          for(j = 0; j++; j<4){
-              cj[novoNo] = cj+5[filhoCheio]
-              prj[novoNo] = prj+5[filhoCheio]
-          }
+         - for(j = 0; j++; j<4){
+         -   cj[novoNo] = cj+5[filhoCheio]
+         -   prj[novoNo] = prj+5[filhoCheio]
+         - }
 
-          if(p0[filhoCheio] != -1){ //checa se nao é no folha
-            for(j=0; j++; j<5)
-              pj[novoNo] = pj+5[filhoCheio]
-          }
-          n[filhoCheio] = 4
+         - if(p0[filhoCheio] != -1){ //checa se nao é no folha
+         -   for(j=0; j++; j<5)
+         -     pj[novoNo] = pj+5[filhoCheio]
+         - }
+         - n[filhoCheio] = 4
 
-          for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
-            pj+1[pai] = pj[pai]
-          }
-          //atençao que é i e nao j aqui embaixo
-          pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
+         - for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
+         -   pj+1[pai] = pj[pai]
+         - }
+         - //atençao que é i e nao j aqui embaixo
+         - pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
 
-          for(j = n[pai]-1; j--; j<i)
-            cj+1[pai] = cj[pai]
-            prj+1[pai] = prj[pai]
-          }
-          ci-1[pai] = c4[filhoCheio]
-          pri-1[pai] = pr4[filhoCheio]
+         - for(j = n[pai]-1; j--; j<i){
+         -   cj+1[pai] = cj[pai]
+         -   prj+1[pai] = prj[pai]
+         - }
+          ci[pai] = c4[filhoCheio]
+          pri[pai] = pr4[filhoCheio]
 
           n[pai]++
 
+          put(filhoCheio)
           put(novoNo)
           put(pai)
-          put(filhoCheio)
         }
   */
   int i;
+  Cabecalho_B cab;
 
+  //Pula até o ultimo RRN
+  fseek(b, 9, SEEK_SET);
+
+  //Lendo o ultimo RRN da arvore
+  fread(&cab.ultimoRRN, sizeof(int), 1, b);
+  printf("cab.ultimoRRN do split %d\n", cab.ultimoRRN);
+
+  //aloca novo nó
   arvoreB* new = (arvoreB *) calloc(1, sizeof(arvoreB));
   new->n = 0;
   for(i = 0;i < 9;i++){
@@ -1009,6 +1018,50 @@ void split_B(FILE *b, arvoreB pai, int RRN_pai, int meio, arvoreB filhoCheio, in
       new->pr[i] = -1;
   }
   new->pr[i] = -1;
+
+  //Atualiza o ultimo RRN
+  fseek(b, -4, SEEK_CUR);
+  cab.ultimoRRN++;
+  fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+  new->n = 4;
+
+  //Copia as chaves da segunda metade do filhoCheio para o novo nó
+  for(i = 0; i < 4; i++){
+      new->c[i] = filhoCheio->c[i+5];
+      new->pr[i] = filhoCheio->pr[i+5];
+  }
+
+  //checa se filhoCheio nao é no folha
+  if(filhoCheio->p[0] == -1){
+    for(i = 0; i < 5; i++)
+      new->p[i] = filhoCheio->p[i+5];
+  }
+  filhoCheio->n = 4;
+
+  //ordena os ponteiros do no pai até o espaco do novo ponteiro
+  for(i = pai->n; i <= pont+1; i--)
+    pai->p[i+1] = pai->p[i];
+
+  //ponteiro de pai recebe o rrn do novo no (do lado do no do irmao)
+  pai->p[pont+1] = cab.ultimoRRN;
+
+  //ordena as chaves de pai até a posicao desejada
+  for(i = pai->n-1; i <= pont; i--){
+    pai->c[i+1] = pai->c[i];
+    pai->pr[i+1] = pai->pr[i];
+  }
+
+  //insere a chave do filhoCheio no pai
+  pai->c[pont] = filhoCheio->c[4];
+  pai->pr[pont] = filhoCheio->pr[4];
+
+  pai->n++;
+
+  //insere os nos alterados no buffer
+  put(b, RRN_filhoCheio, filhoCheio, bp);
+  put(b, cab.ultimoRRN, new, bp);
+  put(b, RRN_pai, pai, bp);
 }
 
 void pesquisa_B(){
