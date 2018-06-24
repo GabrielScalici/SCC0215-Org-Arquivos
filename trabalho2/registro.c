@@ -779,10 +779,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
         bp->RRN[i] = -1;
         bp->freq[i] = 0;
     }
- 
+
     //insere todos os registros do arquivo de dados no arquivo de indices
     for(int i = 0; i < 10; i++){
-        inserir_B(b, reg[i], i, bp); 
+        inserir_B(b, reg[i], i, bp);
     }
 
     printa_bPool(bp);
@@ -898,8 +898,8 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   }
   else{
     bp->freq[0]++;
-    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
-  } 
+    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
+  }
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
@@ -1116,9 +1116,9 @@ int get(FILE *b, int RRN, bPool *bufPool){
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         if(bufPool->RRN[i] == RRN){         //RRN está no buffer
-            aux->n = bufPool->node[i].n;    
+            aux->n = bufPool->node[i].n;
             for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
-                //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+                //Copia todo o conteudo do nó que está no buffer para uma auxiliar
                 aux->p[j] = bufPool->node[i].p[j];
                 aux->c[j] = bufPool->node[i].c[j];
                 aux->pr[j] = bufPool->node[i].pr[j];
@@ -1139,7 +1139,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
         //Indo pro RRN desejado
         fseek(b, RRN*TAM_NO_INDICE, SEEK_CUR);
 
-        //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+        //Copia todo o conteudo do nó que está no buffer para uma auxiliar
         fread(&aux->n, 1, sizeof(int), b);
         for(j = 0;j < bufPool->node[i].n;j++){          //Roda por todos os registros do nó
             fread(&aux->p[i], 1, sizeof(int), b);
@@ -1171,14 +1171,14 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     int i, j;
     int isVazio = -1;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
     //Variáveis pra localizar o menos utilizado (LFU)
-    int menor = INT_MAX;      
+    int menor = INT_MAX;
     int pos = -1;
     int aux;
 
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
-        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
+        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;
         if(bufPool->RRN[i] == RRN){
             for(j = 0;j < 9;j++){
                 bufPool->node[i].p[j] = page->p[j];
@@ -1231,7 +1231,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
             bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[pos] = 1;                           //Primeiro acesso
             bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
-        } 
+        }
     }
 
     return pos;
@@ -1306,3 +1306,95 @@ void printa_bPool(bPool* bp){
     printf("\n");
   }
 }
+
+int busca_B(bPool *b. int codInep, int rrn){
+    int i=0;
+    int pos_buffer;
+
+    //Caso nao tenha sido encontrado
+    if(rrn == -1){
+        return -1;
+    }
+
+    //Pegando o valor da posicao no bufferpool
+    pos_buffer = get(int *b, int RRN, bPool *bufPool)
+
+    for(i=0; i < TAM_BUFFER < i++){
+        if(codInep == /*valor da chave no buffer*/ ){
+            return rrn chave do buffer
+        }else if(codINEP < /*valor da chave no buffer*/){
+            //Chamada recursiva para o nó filho
+            busca_B(b, codInep, /*ponteiro para o filho*/);
+        }
+        //Caso não seja menor que nenhum, então vai para o ponteiro do maior filho
+        //Chamado recursivamente
+        busca_B(b, codInep, /*ponteiro para o maior filho do no*/);
+
+    }
+}
+
+/*
+void busca_B(Registro *reg, int chave){
+    FILE *b;
+    Cabecalho_B cab;
+    int i = 0;
+
+    b = fopen("arvoreB.bin", "r+b");
+
+    //TUDO CABEÇALHO
+    //Alterar o status
+    cab.status = '0';
+    fwrite(&cab.status, sizeof(char), 1, b);
+    printf("cab.status %c\n", cab.status);
+
+    //Lendo o no raiz
+    fread(&cab.noRaiz, sizeof(int), 1, b);
+    printf("cab.noRaiz %d\n", cab.noRaiz);
+
+    //Lendo a altura da arvore
+    fread(&cab.altura, sizeof(int), 1, b);
+    printf("cab.altura %d\n", cab.altura);
+
+    //Lendo o ultimo RRN da arvore
+    fread(&cab.ultimoRRN, sizeof(int), 1, b);
+    printf("cab.ultimoRRN %d\n\n", cab.ultimoRRN);
+
+    //INICIO DA BUSCA NO INDICE DE ARVORE B
+    i=0;
+
+    while(i <= cab.altura){
+
+        //Caso tenha chegado até o final e nao encontrou
+        if(i == cab.altura){
+            printf("Registro inexistente.\n");
+            break;
+        }
+
+        //Pegando os valores
+
+        //Caso tenha encontrado o indice
+        if(chave == value){
+            //Busca o rnn do valor codInep e exibe para o usuario
+            busca_rrn_parametro("codINEP", value);
+            break;
+        }else{
+            //
+
+        }
+
+        i++;
+    }
+
+    //Atualizar o status
+    //Posicionando no comeco do arquivo
+    fseek(b, 0, SEEK_SET);
+    //Colocando status como 1 para indicar que ocorreu tudo certo
+    cab.status = '1';
+    fwrite(&cab.status, sizeof(char), 1, b);
+    printf("cab.status %c\n", cab.status);
+
+    //Fechando o arquivo
+    fclose(b);
+
+}
+*/

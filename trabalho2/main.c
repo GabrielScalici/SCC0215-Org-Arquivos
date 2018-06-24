@@ -12,7 +12,8 @@ enum options{
 	ATUALIZA = 7,
 	COMPACTA = 8,
 	RECUPERAREMOVIDOS = 9,
-	INSERIR_INDICE = 10
+	INSERIR_INDICE = 10,
+	RECUPERAR_INDICE = 12
 };
 
 int main(int argc, char *argv[]){
@@ -136,6 +137,17 @@ int main(int argc, char *argv[]){
 			b = criar_indice(reg, qtdRegs);
 
 			fclose(f);
+
+			break;
+		}
+		case(RECUPERAR_INDICE):{
+			int rrn_desejado = 0;
+			//PAssando o rrn 0 da raiz para que seja analisado corretamente
+			rrn_desejado = busca_B(Registro *reg, argv[2], 0);
+
+			//Chamando a funcao de busca pelo registro de rrn desejado
+			//Já exibe corretamente o valor da busca
+			busca_rrn(rrn);
 			
 			break;
 		}
