@@ -782,7 +782,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < qtdRegs; i++){
         inserir_B(b, reg[i], i, bp); 
     }
 
@@ -858,7 +858,6 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //Insere nova chave
     raiz->c[0] = reg.codINEP;
     raiz->pr[0] = RRN_reg;
-
     //Coloca no buffer
     put(b, cab.ultimoRRN, raiz, bp);
   }
@@ -887,6 +886,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //atualiza ultimoRRN
     cab.ultimoRRN++;
     fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
 
     //aplica o split da raiz antiga
     split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
@@ -1061,11 +1061,11 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   pai->n++;
 
   //insere os nos alterados no buffer
-  printf("RRNfilhoCheio - ");
+  //printf("RRNfilhoCheio no split -  %d", RRN_filhoCheio);
   put(b, RRN_filhoCheio, filhoCheio, bp);
-  printf("pai - ");
+  //printf("RRN_pai no split -  %d", RRN_pai);
   put(b, RRN_pai, pai, bp);
-  printf("novo - ");
+  //printf("RRNnovo no split -  %d", cab.ultimoRRN);
   put(b, cab.ultimoRRN, new, bp);
 }
 
@@ -1218,7 +1218,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
             }
             bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[isVazio] = 1;
-            //bufPool->RRN[isVazio] = RRN;
+            bufPool->RRN[isVazio] = RRN;
 
             return isVazio;
         }else{
