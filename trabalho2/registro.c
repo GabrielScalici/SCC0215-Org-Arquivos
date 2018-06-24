@@ -828,7 +828,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
 
   //Lendo o ultimo RRN da arvore
   fread(&cab.ultimoRRN, sizeof(int), 1, b);
-  printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
+  printf("cab.ultimoRRN %d\n\n", cab.ultimoRRN);
 
   //Se a arvore estiver vazia
   if(cab.noRaiz == -1){
@@ -892,11 +892,11 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
 
     //Coloca a novaRaiz no slot 0 do buffer
-    swapRaiz(cab.noRaiz, bp);
+    //swapRaiz(cab.noRaiz, bp);
 
     //Insere nova chave
-    bp->freq[0]++;
-    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
+    bp->freq[1]++;
+    insere_naoCheio_B(b, &bp->node[1], cab.noRaiz, reg, RRN_reg, bp);
   }
   else{
     bp->freq[0]++;
@@ -1033,21 +1033,23 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   }
 
   //checa se filhoCheio nao é no folha
-  if(filhoCheio->p[0] == -1){
+  if(filhoCheio->p[0] != -1){
     for(i = 0; i < 5; i++)
       new->p[i] = filhoCheio->p[i+5];
   }
   filhoCheio->n = 4;
+  new->n = 4;
 
   //ordena os ponteiros do no pai até o espaco do novo ponteiro
-  for(i = pai->n; i <= pont+1; i--)
+  printf("pai->n = %d || pont+1 = %d\n", pai->n, pont+1);
+  for(i = pai->n; i >= pont+1; i--)
     pai->p[i+1] = pai->p[i];
 
   //ponteiro de pai recebe o rrn do novo no (do lado do no do irmao)
   pai->p[pont+1] = cab.ultimoRRN;
 
   //ordena as chaves de pai até a posicao desejada
-  for(i = pai->n-1; i <= pont; i--){
+  for(i = pai->n-1; i >= pont; i--){
     pai->c[i+1] = pai->c[i];
     pai->pr[i+1] = pai->pr[i];
   }
@@ -1211,7 +1213,9 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
                 bufPool->node[isVazio].pr[j] = page->pr[j];
             }
             bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
-            
+            //bufPool->freq[pos] = 1;
+            //bufPool->RRN[pos] = RRN;
+
             return isVazio;
         }else{
             //Acha a página menos frequentada tirando a raiz
