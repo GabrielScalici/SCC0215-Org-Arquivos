@@ -107,9 +107,10 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
 
 //Buffer pool
 int get(FILE *b, int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
-int put(FILE *b, int RRN, arvoreB* page, bPool *bufPool);       //Armazena página no buffer
-void flush_full(bPool *bufPool);                        //Manda todas as páginas pro arquivo
-void flush(FILE *b, arvoreB page, int RRN, bPool *bufPool);      //Manda uma página específica pro arquivo
-void printa_bPool(bPool* bp);                           //Printa o bufferpool inteiro
+int put(FILE *b, int RRN, arvoreB* page, bPool *bufPool);   //Armazena página no buffer
+void flush_full(bPool *bufPool);                            //Manda todas as páginas pro arquivo
+void flush(FILE *b, arvoreB page, int RRN, bPool *bufPool); //Manda uma página específica pro arquivo
+void swapRaiz(int RRN_novaRaiz, bPool* bp);                 //Coloca a nova raiz na posição certa do buffer
+void printa_bPool(bPool* bp);                               //Printa o bufferpool inteiro
 
 #endif

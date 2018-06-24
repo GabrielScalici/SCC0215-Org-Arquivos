@@ -782,7 +782,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 9; i++){
+    for(int i = 0; i < 10; i++){
         inserir_B(b, reg[i], i, bp); 
     }
 
@@ -892,7 +892,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
 
     //Coloca a novaRaiz no slot 0 do buffer
-    //swapPosição(raiz(antiga), novaRaiz)
+    swapRaiz(cab.noRaiz, bp);
 
     //Insere nova chave
     bp->freq[0]++;
@@ -1273,6 +1273,25 @@ void flush(FILE *b, arvoreB page, int RRN, bPool* bufPool){
     fwrite(&status, sizeof(char), 1, b);
 
     fclose(b);
+}
+
+//Função para colocar a nova raiz na posição certa do buffer
+void swapRaiz(int RRN_novaRaiz, bPool* bp){
+  int i;
+  arvoreB aux;
+  int auxRRN;
+
+  for(i = 1; i < TAM_BUFFER; i++){
+    if(bp->RRN[i] == RRN_novaRaiz) break;
+  }
+
+  auxRRN = bp->RRN[0];
+  bp->RRN[0] = bp->RRN[i];
+  bp->RRN[i] = auxRRN;
+
+  aux = bp->node[0];
+  bp->node[0] = bp->node[i];
+  bp->node[i] = aux;
 }
 
 //Função para printar a bufferpool inteira
