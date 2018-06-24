@@ -781,7 +781,8 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 40; i++){
+        printf("\n\nREG %d\n\n", i);
         inserir_B(b, reg[i], i, bp); 
     }
 
@@ -890,11 +891,11 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
 
     //Coloca a novaRaiz no slot 0 do buffer
-    //swapRaiz(cab.noRaiz, bp);
+    swapRaiz(cab.noRaiz, bp);
 
     //Insere nova chave
-    bp->freq[1]++;
-    insere_naoCheio_B(b, &bp->node[1], cab.noRaiz, reg, RRN_reg, bp);
+    bp->freq[0]++;
+    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
   }
   else{
     bp->freq[0]++;
@@ -1055,10 +1056,22 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   //insere os nos alterados no buffer
   //printf("RRNfilhoCheio no split -  %d", RRN_filhoCheio);
   put(b, RRN_filhoCheio, filhoCheio, bp);
-  //printf("RRN_pai no split -  %d", RRN_pai);
+  char cAux;
+  /*fseek(b, 0, SEEK_SET);
+  fread(&cAux, sizeof(char), 1, b);
+  printf("cAux = %c\n", cAux);*/
+
   put(b, RRN_pai, pai, bp);
+  /*fseek(b, 0, SEEK_SET);
+  fread(&cAux, sizeof(char), 1, b);
+  printf("cAux = %c\n", cAux);*/
+
   //printf("RRNnovo no split -  %d", cab.ultimoRRN);
   put(b, cab.ultimoRRN, new, bp);
+  fseek(b, 0, SEEK_SET);
+  fread(&cAux, sizeof(char), 1, b);
+  printf("cAux = %c\n", cAux);
+  printf("\n\nPOS SPLIT \n\n");
 }
 
 void pesquisa_B(){
@@ -1271,24 +1284,56 @@ void flush(FILE *b, arvoreB page, int RRN, bPool* bufPool){
     fclose(b);
 }
 
-//Função para colocar a nova raiz na posição certa do buffer
+///Função para colocar a nova raiz na posição certa do buffer
 void swapRaiz(int RRN_novaRaiz, bPool* bp){
-  int i;
-  arvoreB aux;
-  int auxRRN;
-
+  int i,j;
+  int auxN=0,auxRRN=0, auxFreq=0;
+  int auxC[9],auxP[9], auxPR[9];
+ 
+  //encontrando o indice
   for(i = 1; i < TAM_BUFFER; i++){
     if(bp->RRN[i] == RRN_novaRaiz) break;
   }
 
+  //trocando os RRN
   auxRRN = bp->RRN[0];
   bp->RRN[0] = bp->RRN[i];
   bp->RRN[i] = auxRRN;
 
-  aux = bp->node[0];
-  bp->node[0] = bp->node[i];
-  bp->node[i] = aux;
+  //Trocando as frequencias
+  auxFreq = bp->freq[0];
+  bp->freq[0] = bp->freq[i];
+  bp->freq[i] = auxFreq;
+ 
+  //trocando os n
+  auxN = bp->node[0].n;
+  bp->node[0].n = bp->node[i].n;
+  bp->node[i].n = auxN;
+ 
+   
+    //trocando os c's,p's, e pr's
+    for(j=0;j< auxN;j++){
+      auxC[j]= bp->node[0].c[j];
+      auxP[j]= bp->node[0].p[j];
+      auxPR[j]= bp->node[0].pr[j];
+    }
+    auxP[j]= bp->node[0].p[j];
+    
+    for(j=0;j< bp->node[0].n;j++){
+      bp->node[0].c[j] = bp->node[i].c[j];
+      bp->node[0].p[j] = bp->node[i].p[j];
+      bp->node[0].pr[j] = bp->node[i].pr[j];
+    }
+    bp->node[0].p[j] = bp->node[i].p[j];
+    
+    for(j=0;j< bp->node[i].n;j++){
+      bp->node[i].c[j] = auxC[j];
+      bp->node[i].p[j] = auxP[j];
+      bp->node[i].pr[j]= auxPR[j];
+    }
+    bp->node[i].p[j] = auxP[j];
 }
+
 
 //Função para printar a bufferpool inteira
 void printa_bPool(bPool* bp){
