@@ -149,8 +149,8 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
     //Escreve o cabecalho no arquivo
     fwrite(&cab.status, sizeof(char), 1, f);
     fwrite(&cab.topoPilha,sizeof(int),1,f);
-    printf("%c \n",cab.status);
-    printf("%d \n",cab.topoPilha);
+    //printf("%c \n",cab.status);
+    //printf("%d \n",cab.topoPilha);
 
 
     //Escreve todos os registros no arquivo na ordem correta
@@ -462,7 +462,7 @@ void recupera_rrn(){
 
 }
 
-void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
+int inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
   int status = 0;
 
   //Abrindo o arquivo
@@ -527,7 +527,8 @@ void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* 
     fseek(f, 0, SEEK_SET);
     fwrite(&status, sizeof(char), 1, f);
     fclose(f);
-
+ 
+  return rrn_topo_pilha;
 }
 
 void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest){
@@ -723,7 +724,7 @@ void busca_rrn_parametro(char* campo, char* valor){
 int hit, fault;
 
 //Indice
-FILE* criar_indice(Registro *reg, int qtdRegs){
+FILE* criar_indice(Registro *reg, int qtdRegs, bPool *bp){
     FILE* b;
 
     //Criando o arquivo de indices chamado de (arvoreB.bin)
@@ -731,16 +732,15 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
     verifica_arquivo(b, CARREGANDO);
 
     //Criando o cabecalho arvore B chamado (arvoreB.bin)
-    criar_arvore_B(reg, qtdRegs);
+    criar_arvore_B(reg, qtdRegs, bp);
 
     return b;
 }
 
 //Funcao para carregar o arquivo de arvore B
-void criar_arvore_B(Registro *reg, int qtdRegs){
+void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp){
     FILE *b;        //Arquivo da árvore B 
     FILE *fp;       //Arquivo de buffer-info
-    bPool *bp;      //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
     arvoreB *root = NULL;
     int tamAtual = 0;       //Numero de nós na árvore
     int i, j = 0;
@@ -764,10 +764,6 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fwrite(&cab.noRaiz,sizeof(int),1,b);
     fwrite(&cab.altura,sizeof(int),1,b);
     fwrite(&cab.ultimoRRN,sizeof(int),1,b);
-    /*printf("cab.status %c\n", cab.status);
-    printf("cab.noRaiz %d\n", cab.noRaiz);
-    printf("cab.altura %d\n", cab.altura);
-    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);*/
 
     //Inicializando a ArvoreB
     root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
@@ -779,29 +775,16 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
         root->pr[i] = -1;
     }
     root->pr[i] = -1;
-
-    //Inicializando o buffer pool
-    bp = (bPool *) calloc(1, sizeof(bPool));
-    for(i = 0;i < TAM_BUFFER;i++){
-        bp->RRN[i] = -1;
-        bp->freq[i] = 0;
-    }
-
+ 
     //insere todos os registros do arquivo de dados no arquivo de indices
-<<<<<<< HEAD
     for(int i = 0; i < 10; i++){
-        inserir_B(b, reg[i], i, bp);
-=======
-    for(int i = 0; i < 20; i++){
-        printf("\n\nREG %d\n\n", i);
         inserir_B(b, reg[i], i, bp); 
         if(i == 10){
+          printf("\ni = %d\n\n", i);
           fseek(b, 9, SEEK_SET);
           int ultimoRRN;
           fread(&ultimoRRN, sizeof(int), 1, b);
-          printf("E AGORA KRL %d\n", ultimoRRN);
         }
->>>>>>> 983f955feab0437714abf153a9a38090c57801fc
     }
 
     //Grava o arquivo de infos
@@ -809,7 +792,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fprintf(fp, "Page fault: %d; Page hit: %d. \n", fault, hit);
     fclose(fp);
 
-    printa_bPool(bp);
+    //printa_bPool(bp);
 
     fclose(b);
 }
@@ -818,44 +801,34 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   int i, noRaiz, altura, ultimoRRN;
   char status;
 
-  fseek(b, 9, SEEK_SET);//9
-  fread(&ultimoRRN, sizeof(int), 1, b);//13
-  printf("E AQUI %d\n", ultimoRRN);
-
-  fseek(b, 0, SEEK_SET);//0
+  fseek(b, 0, SEEK_SET);
   //TUDO CABEÇALHO
   //Alterar o status
   status = '0';
-  fwrite(&status, sizeof(char), 1, b);//1
-  printf("tatus %c\n", status);
+  fwrite(&status, sizeof(char), 1, b);
+  //printf("status %c\n", status);
 
   //Lendo o no raiz
-  fread(&noRaiz, sizeof(int), 1, b);//5
-  printf("noRaiz %d\n", noRaiz);
+  fread(&noRaiz, sizeof(int), 1, b);
+  //printf("noRaiz %d\n", noRaiz);
 
   //Lendo a altura da arvore
-  fread(&altura, sizeof(int), 1, b);//9
-  printf("altura %d\n", altura);
+  fread(&altura, sizeof(int), 1, b);
+  //printf("altura %d\n", altura);
 
-  //Lendo o ultimo RRN da arvore//9
-  fread(&ultimoRRN, sizeof(int), 1, b);//13
-  if(RRN_reg == 10){
-    ultimoRRN++;
-    fseek(b, -4, SEEK_CUR);
-    fwrite(&ultimoRRN, sizeof(int), 1, b);
-  }
-  printf("ultimoRRN %d\n\n", ultimoRRN);
+  //Lendo o ultimo RRN da arvore
+  fread(&ultimoRRN, sizeof(int), 1, b);
+  //printf("ultimoRRN %d\n\n", ultimoRRN);
 
   //Se a arvore estiver vazia
   if(noRaiz == -1){
-    //printf("antes do buffer\n");
     //volta para o inicio pulando o status
     fseek(b, 0, SEEK_SET);
     fread(&status, sizeof(char), 1, b);
     //atualiza o no raiz
     noRaiz = 0;
     fwrite(&noRaiz, sizeof(int), 1, b);
-    //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
+    //pula a altura                       
     fread(&altura, sizeof(int), 1, b);
     //atualiza ultimoRRN
     ultimoRRN = 0;
@@ -874,6 +847,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //Insere nova chave
     raiz->c[0] = reg.codINEP;
     raiz->pr[0] = RRN_reg;
+
     //Coloca no buffer
     put(b, ultimoRRN, raiz, bp);
   }
@@ -915,17 +889,11 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     insere_naoCheio_B(b, &bp->node[0], noRaiz, reg, RRN_reg, bp);
     fseek(b, 9, SEEK_SET);
     fread(&ultimoRRN, sizeof(int), 1, b);
-    printf("E AGORA FDP %d\n", ultimoRRN);
   }
   else{
     bp->freq[0]++;
-<<<<<<< HEAD
-    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);
-  }
-=======
     insere_naoCheio_B(b, &bp->node[0], noRaiz, reg, RRN_reg, bp);   
   } 
->>>>>>> 983f955feab0437714abf153a9a38090c57801fc
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
@@ -975,12 +943,7 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
 
   //Lendo o ultimo RRN da arvore
   fread(&ultimoRRN, sizeof(int), 1, b);
-  printf("ultimoRRN do split %d\n", ultimoRRN);
-  fseek(b, -4, SEEK_CUR);
-  printf("CHECANDO -- %d\n", ultimoRRN);
-  ultimoRRN++;
-  fwrite(&ultimoRRN, sizeof(int), 1, b);
-  printf("CHECANDO -- %d\n", ultimoRRN);
+  //printf("ultimoRRN do split %d\n", ultimoRRN);
 
   //aloca novo nó
   arvoreB* new = (arvoreB *) calloc(1, sizeof(arvoreB));
@@ -993,7 +956,9 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   new->pr[i] = -1;
 
   //Atualiza o ultimo RRN
-
+  fseek(b, -4, SEEK_CUR);
+  ultimoRRN++;
+  fwrite(&ultimoRRN, sizeof(int), 1, b);
 
   new->n = 4;
 
@@ -1012,7 +977,6 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   new->n = 4;
 
   //ordena os ponteiros do no pai até o espaco do novo ponteiro
-  //printf("pai->n = %d || pont+1 = %d\n", pai->n, pont+1);
   for(i = pai->n; i >= pont+1; i--)
     pai->p[i+1] = pai->p[i];
 
@@ -1032,10 +996,8 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   pai->n++;
 
   //insere os nos alterados no buffer
-  //printf("RRNfilhoCheio no split -  %d", RRN_filhoCheio);
   put(b, RRN_filhoCheio, filhoCheio, bp);
   put(b, RRN_pai, pai, bp);
-  //printf("RRNnovo no split -  %d", ultimoRRN);
   put(b, ultimoRRN, new, bp);
 
 }
@@ -1077,16 +1039,6 @@ void pesquisa_B(){
 
 int get(FILE *b, int RRN, bPool *bufPool){
 
-    //if esta no bufferpool
-        //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
-        //2: realize possíveis reestruturações na organização do buffer (LFU)
-        //3: retorne P
-
-    //else nao esta no buffer
-        //1: recupere o conteúdo da página do disco e armazena em uma variável auxiliar do tipo IndexPage, chamada P
-        //2: insira P no buffer, chamando a função put
-        //3: retorne P.
-
     arvoreB *aux;
     int i, j, resp;
 
@@ -1095,14 +1047,10 @@ int get(FILE *b, int RRN, bPool *bufPool){
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         if(bufPool->RRN[i] == RRN){         //RRN está no buffer
-<<<<<<< HEAD
-            aux->n = bufPool->node[i].n;
-=======
             hit++;                          //Atualiza hit
             aux->n = bufPool->node[i].n;    
->>>>>>> 983f955feab0437714abf153a9a38090c57801fc
             for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
-                //Copia todo o conteudo do nó que está no buffer para uma auxiliar
+                //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
                 aux->p[j] = bufPool->node[i].p[j];
                 aux->c[j] = bufPool->node[i].c[j];
                 aux->pr[j] = bufPool->node[i].pr[j];
@@ -1124,7 +1072,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
         //Indo pro RRN desejado
         fseek(b, RRN*TAM_NO_INDICE, SEEK_CUR);
 
-        //Copia todo o conteudo do nó que está no buffer para uma auxiliar
+        //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
         fread(&aux->n, 1, sizeof(int), b);
         for(j = 0;j < bufPool->node[i].n;j++){          //Roda por todos os registros do nó
             fread(&aux->p[i], 1, sizeof(int), b);
@@ -1142,33 +1090,19 @@ int get(FILE *b, int RRN, bPool *bufPool){
 }
 
 int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
-    printf("RRN = %d\n", RRN);
-    //if nao esta no buffer POOL
-        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
-        //2: se o buffer conter espaço disponível : insira P no espaço disponível
-        //3: caso contrário : remova uma página N do buffer e insira P (LFU)
-
-    //else se esta no buffer
-        //1: recupere a página armazenada no buffer e atualize seu conteúdo
-        //2: marque que P é uma página modificada
-        //3: reorganize a estrutura interna do buffer (LFU)
 
     int i, j;
     int isVazio = -1;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
     //Variáveis pra localizar o menos utilizado (LFU)
-    int menor = INT_MAX;
+    int menor = INT_MAX;      
     int pos = -1;
     int aux;
 
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
-<<<<<<< HEAD
-        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;
-=======
         hit++;          //Atualiza hit;
         if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
->>>>>>> 983f955feab0437714abf153a9a38090c57801fc
         if(bufPool->RRN[i] == RRN){
             for(j = 0;j < 9;j++){
                 bufPool->node[i].p[j] = page->p[j];
@@ -1187,7 +1121,6 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     if(i == TAM_BUFFER){
         fault++;            //Atualiza fault
         if(isVazio != -1){
-            //printf("isVazio = %d\n", isVazio);
             //Copia a pagina pro buffer
             bufPool->node[isVazio].n = page->n;
             for(j = 0;j < 9;j++){
@@ -1222,7 +1155,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
             bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[pos] = 1;                           //Primeiro acesso
             bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
-        }
+        } 
     }
 
     return pos;
@@ -1329,95 +1262,3 @@ void printa_bPool(bPool* bp){
     printf("\n");
   }
 }
-
-int busca_B(bPool *b. int codInep, int rrn){
-    int i=0;
-    int pos_buffer;
-
-    //Caso nao tenha sido encontrado
-    if(rrn == -1){
-        return -1;
-    }
-
-    //Pegando o valor da posicao no bufferpool
-    pos_buffer = get(int *b, int RRN, bPool *bufPool)
-
-    for(i=0; i < TAM_BUFFER < i++){
-        if(codInep == /*valor da chave no buffer*/ ){
-            return rrn chave do buffer
-        }else if(codINEP < /*valor da chave no buffer*/){
-            //Chamada recursiva para o nó filho
-            busca_B(b, codInep, /*ponteiro para o filho*/);
-        }
-        //Caso não seja menor que nenhum, então vai para o ponteiro do maior filho
-        //Chamado recursivamente
-        busca_B(b, codInep, /*ponteiro para o maior filho do no*/);
-
-    }
-}
-
-/*
-void busca_B(Registro *reg, int chave){
-    FILE *b;
-    Cabecalho_B cab;
-    int i = 0;
-
-    b = fopen("arvoreB.bin", "r+b");
-
-    //TUDO CABEÇALHO
-    //Alterar o status
-    cab.status = '0';
-    fwrite(&cab.status, sizeof(char), 1, b);
-    printf("cab.status %c\n", cab.status);
-
-    //Lendo o no raiz
-    fread(&cab.noRaiz, sizeof(int), 1, b);
-    printf("cab.noRaiz %d\n", cab.noRaiz);
-
-    //Lendo a altura da arvore
-    fread(&cab.altura, sizeof(int), 1, b);
-    printf("cab.altura %d\n", cab.altura);
-
-    //Lendo o ultimo RRN da arvore
-    fread(&cab.ultimoRRN, sizeof(int), 1, b);
-    printf("cab.ultimoRRN %d\n\n", cab.ultimoRRN);
-
-    //INICIO DA BUSCA NO INDICE DE ARVORE B
-    i=0;
-
-    while(i <= cab.altura){
-
-        //Caso tenha chegado até o final e nao encontrou
-        if(i == cab.altura){
-            printf("Registro inexistente.\n");
-            break;
-        }
-
-        //Pegando os valores
-
-        //Caso tenha encontrado o indice
-        if(chave == value){
-            //Busca o rnn do valor codInep e exibe para o usuario
-            busca_rrn_parametro("codINEP", value);
-            break;
-        }else{
-            //
-
-        }
-
-        i++;
-    }
-
-    //Atualizar o status
-    //Posicionando no comeco do arquivo
-    fseek(b, 0, SEEK_SET);
-    //Colocando status como 1 para indicar que ocorreu tudo certo
-    cab.status = '1';
-    fwrite(&cab.status, sizeof(char), 1, b);
-    printf("cab.status %c\n", cab.status);
-
-    //Fechando o arquivo
-    fclose(b);
-
-}
-*/

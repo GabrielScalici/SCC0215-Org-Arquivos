@@ -50,7 +50,7 @@ void busca_rrn(int RRN);
 void remover_registro_rrn(int RRN);
 void printa_arquivo();
 void recupera_rrn();
-void inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
+int inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void atualizar_registro(int rrn, int cod, char data[10], char uf[2], char* nome_esc, char* muni, char* prest);
 void busca_rrn_parametro(char* campo, char* valor);
 
@@ -99,8 +99,8 @@ typedef struct{
   */
 
 //ArvoreB
-FILE* criar_indice(Registro *reg, int qtdRegs);
-void criar_arvore_B(Registro *reg, int qtdRegs);
+FILE* criar_indice(Registro *reg, int qtdRegs, bPool *bp);
+void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp);
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp);
 void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio);

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "registro.h"
 
 enum options{
@@ -12,8 +13,8 @@ enum options{
 	ATUALIZA = 7,
 	COMPACTA = 8,
 	RECUPERAREMOVIDOS = 9,
-	INSERIR_INDICE = 10,
-	RECUPERAR_INDICE = 12
+	INSERIR_ARQ_INDICE = 10,
+  	INSERIR_INDICE = 11
 };
 
 int main(int argc, char *argv[]){
@@ -21,9 +22,17 @@ int main(int argc, char *argv[]){
 	FILE *b;
 	Cabecalho cab;  //Cabeçalho do arquivo
 	Registro *reg;  //Vetor de registros
+  bPool *bp;
 	int qtdRegs;    //Quantidade de registros no arquivo
 
 	int opt = atoi(argv[1]);    //argv[1] = opção escolhida
+
+  //Inicializando o buffer pool
+  bp = (bPool *) calloc(1, sizeof(bPool));
+  for(int i = 0;i < TAM_BUFFER;i++){
+      bp->RRN[i] = -1;
+      bp->freq[i] = 0;
+  }
 
 	switch(opt){
 		case(LEITURA):{
@@ -110,7 +119,7 @@ int main(int argc, char *argv[]){
 
 			break;
 		}
-		case(INSERIR_INDICE):{
+		case(INSERIR_ARQ_INDICE):{
 			int tam;    //Tamanho do arquivo
 			int i;
 			char c;
@@ -134,23 +143,36 @@ int main(int argc, char *argv[]){
 			//Fim da criação do arquivo de dados
 
 			//Criando a Árvore B
-			b = criar_indice(reg, qtdRegs);
+			b = criar_indice(reg, qtdRegs, bp);
 
 			fclose(f);
 
 			break;
 		}
-		case(RECUPERAR_INDICE):{
-			int rrn_desejado = 0;
-			//PAssando o rrn 0 da raiz para que seja analisado corretamente
-			rrn_desejado = busca_B(Registro *reg, argv[2], 0);
+    case(INSERIR_INDICE):{
+      int cod = atoi(argv[2]);
+      char* data = argv[3];
+      char* uf = argv[4];
+      char* nome_esc = argv[5];
+      char* muni = argv[6];
+      char* prest = argv[7];
 
-			//Chamando a funcao de busca pelo registro de rrn desejado
-			//Já exibe corretamente o valor da busca
-			busca_rrn(rrn);
-			
-			break;
-		}
+      Registro reg;
+      reg.codINEP = cod;
+      strcpy(reg.dataAtiv, data);
+      strcpy(reg.uf, uf);
+      strcpy(reg.nomEscola, nome_esc);
+      strcpy(reg.municipio, muni);
+      strcpy(reg.prestadora, prest);
+
+      //Insere no arquivo de dados
+      int pos = inserir_registro(cod, data, uf, nome_esc, muni, prest);
+
+      b = fopen("arvoreB.bin", "w+b");
+
+      //Insere no arquivo de indice
+      inserir_B(b, reg, pos, bp);
+    }
 	}
 
 	return 0;
