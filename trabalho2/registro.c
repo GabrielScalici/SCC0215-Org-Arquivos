@@ -791,6 +791,12 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     for(int i = 0; i < 20; i++){
         printf("\n\nREG %d\n\n", i);
         inserir_B(b, reg[i], i, bp); 
+        if(i == 10){
+          fseek(b, 9, SEEK_SET);
+          int ultimoRRN;
+          fread(&ultimoRRN, sizeof(int), 1, b);
+          printf("E AGORA KRL %d\n", ultimoRRN);
+        }
     }
 
     //Grava o arquivo de infos
@@ -807,23 +813,32 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   int i, noRaiz, altura, ultimoRRN;
   char status;
 
-  fseek(b, 0, SEEK_SET);
+  fseek(b, 9, SEEK_SET);//9
+  fread(&ultimoRRN, sizeof(int), 1, b);//13
+  printf("E AQUI %d\n", ultimoRRN);
+
+  fseek(b, 0, SEEK_SET);//0
   //TUDO CABEÇALHO
   //Alterar o status
   status = '0';
-  fwrite(&status, sizeof(char), 1, b);
+  fwrite(&status, sizeof(char), 1, b);//1
   printf("tatus %c\n", status);
 
   //Lendo o no raiz
-  fread(&noRaiz, sizeof(int), 1, b);
+  fread(&noRaiz, sizeof(int), 1, b);//5
   printf("noRaiz %d\n", noRaiz);
 
   //Lendo a altura da arvore
-  fread(&altura, sizeof(int), 1, b);
+  fread(&altura, sizeof(int), 1, b);//9
   printf("altura %d\n", altura);
 
-  //Lendo o ultimo RRN da arvore
-  fread(&ultimoRRN, sizeof(int), 1, b);
+  //Lendo o ultimo RRN da arvore//9
+  fread(&ultimoRRN, sizeof(int), 1, b);//13
+  if(RRN_reg == 10){
+    ultimoRRN++;
+    fseek(b, -4, SEEK_CUR);
+    fwrite(&ultimoRRN, sizeof(int), 1, b);
+  }
   printf("ultimoRRN %d\n\n", ultimoRRN);
 
   //Se a arvore estiver vazia
@@ -893,6 +908,9 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //Insere nova chave
     bp->freq[0]++;
     insere_naoCheio_B(b, &bp->node[0], noRaiz, reg, RRN_reg, bp);
+    fseek(b, 9, SEEK_SET);
+    fread(&ultimoRRN, sizeof(int), 1, b);
+    printf("E AGORA FDP %d\n", ultimoRRN);
   }
   else{
     bp->freq[0]++;
@@ -901,31 +919,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
-  /*
-  B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-        - get(no) //através do RRN
-        - i = n[x]
-        - if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
-        - while(i>=0 && k<ci[x]){
-        -   ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
-        -   i--
-        - }
-        - ci+1[x] = k
-        - n[x]++
-        - }
-        - else{
-        - while(i>=0 && k<ci[x])
-        -   i--
-        - i++
-        - FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
-        - if(n[pi[x]] == 9){
-        -   SPLIT(b, bp, x, RRN_indiceX, i, pi[x])
-        -   if(k > ci[x]) i++ (?)
-        - }
-        - B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
-        - }
-    }
-  */
+  
   int pos, posBuffer;
   pos = x->n - 1;
 
@@ -972,6 +966,11 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   //Lendo o ultimo RRN da arvore
   fread(&ultimoRRN, sizeof(int), 1, b);
   printf("ultimoRRN do split %d\n", ultimoRRN);
+  fseek(b, -4, SEEK_CUR);
+  printf("CHECANDO -- %d\n", ultimoRRN);
+  ultimoRRN++;
+  fwrite(&ultimoRRN, sizeof(int), 1, b);
+  printf("CHECANDO -- %d\n", ultimoRRN);
 
   //aloca novo nó
   arvoreB* new = (arvoreB *) calloc(1, sizeof(arvoreB));
@@ -984,9 +983,7 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   new->pr[i] = -1;
 
   //Atualiza o ultimo RRN
-  fseek(b, -4, SEEK_CUR);
-  ultimoRRN++;
-  fwrite(&ultimoRRN, sizeof(int), 1, b);
+
 
   new->n = 4;
 
