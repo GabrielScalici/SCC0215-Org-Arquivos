@@ -4,7 +4,8 @@
  *  NOMES:                      NUMERO USP
  *  GABRIEL SCALICI             9292970
  *  RODRIGO NOVENTA JR          9791243
- *	EDUARDO ALVES BARATELA      10295270
+ *  EDUARDO ALVES BARATELA      10295270
+ *  MATEUS VIRGINIO SILVA       10284156
  *
  */
 
@@ -13,6 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "registro.h"
+#include <limits.h>
 
 
 /*
@@ -79,7 +81,7 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
             else if(alternando == 1){//colocando no campo de dataAtiv
                 reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
-           		strncpy(reg[qtd].dataAtiv, carac,10);
+              strncpy(reg[qtd].dataAtiv, carac,10);
                 alternando=2;
             }
             else if(alternando == 2){//colocando no campo de codINEP
@@ -107,19 +109,19 @@ Registro *recuperar_registros(FILE *f, int qtdRegs){
             }
         }
         else {
-        	if(alternando == 1 && carac[0]== '\0'){
-        		reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
-        		strncpy(reg[qtd].dataAtiv,"0000000000",10);
-        	}
+          if(alternando == 1 && carac[0]== '\0'){
+            reg[qtd].dataAtiv = (char*) malloc(sizeof(char)*10);
+            strncpy(reg[qtd].dataAtiv,"0000000000",10);
+          }
             else if(alternando == 5 && carac[0]== '\0'){
                 reg[qtd].uf = (char*) malloc(sizeof(char)*2);
-            	strncpy(reg[qtd].dataAtiv,"00",2);
+              strncpy(reg[qtd].dataAtiv,"00",2);
             }
             else if(alternando == 0)reg[qtd].tam_prestadora = 0;
             else if(alternando == 3)reg[qtd].tamEscola = 0;
             else if(alternando == 4)reg[qtd].tam_municipio = 0;
-         	alternando++;  //se houver um campo sem informacao pula para o proximo campo
-		}
+          alternando++;  //se houver um campo sem informacao pula para o proximo campo
+    }
         //criar uma nova string temp, para pegar o valor do proximo campo
             free(carac);
             i = 0;
@@ -173,14 +175,15 @@ void transfere_arquivo(Registro* reg, int qtdRegs){
         printf("%s ", reg[i].municipio);
         printf("%d-", reg[i].tam_prestadora);
         printf("%s \n", reg[i].prestadora);
-
        */
         tamAtual = (((28 + reg[i].tamEscola) + reg[i].tam_municipio) + reg[i].tam_prestadora);
         if(tamAtual < TAM_REG){
-        	for(int i =0; i< (TAM_REG - tamAtual);i++)fwrite(&c,sizeof(char),1,f);
+          for(int i =0; i< (TAM_REG - tamAtual);i++)fwrite(&c,sizeof(char),1,f);
         }
        // fwrite(&reg[i],TAM_REG, 1, f);
     }
+
+    fclose(f);
 }
 
 void busca_rrn(int RRN){
@@ -403,6 +406,8 @@ void printa_arquivo(){
     cab.status = '1';
     fwrite(&cab.status, sizeof(char), 1, f);
 
+    fclose(f);
+
     return;
 }
 
@@ -612,110 +617,114 @@ void busca_rrn_parametro(char* campo, char* valor){
     verifica_arquivo(f, RECUPERANDO);    //Verifica se carregou o arquivo
     printf("Arquivo aberto\n");
 
-	fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+  fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
 
 
-	if(strcmp(campo, "codINEP")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+  if(strcmp(campo, "codINEP")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
 
-      	 	//Andando pelo registro até chegar no campo codINEP
-      	 	fseek(f,(i*87),SEEK_CUR);
+          //Andando pelo registro até chegar no campo codINEP
+          fseek(f,(i*87),SEEK_CUR);
 
-		    if(cod == atoi(valor))busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "dataAtiv")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-		    if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+4),SEEK_CUR);
+        if(cod == atoi(valor))busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "dataAtiv")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+        if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+4),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo dataAtiv
-          	fread(data, sizeof(char), 10, f);
+          //Andando pelo registro até chegar no campo dataAtiv
+            fread(data, sizeof(char), 10, f);
 
-		    if(strcmp(data,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "uf")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+14),SEEK_CUR);
+        if(strcmp(data,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "uf")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+14),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo UF
-	        fread(uf, sizeof(char), 2, f);
+          //Andando pelo registro até chegar no campo UF
+          fread(uf, sizeof(char), 2, f);
 
-		    if(strcmp(uf,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "nomeEscola")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-		    if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+16),SEEK_CUR);
+        if(strcmp(uf,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "nomeEscola")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+        if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+16),SEEK_CUR);
 
-      	 	//Andando pelo registro até chegar no campo nomeEscola
-          	fread(&tam_escola, sizeof(int), 1, f);
-          	nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
-    	    nome_escola[tam_escola] = '\0';
-    	    fread(nome_escola, tam_escola, 1, f);
+          //Andando pelo registro até chegar no campo nomeEscola
+            fread(&tam_escola, sizeof(int), 1, f);
+            nome_escola = (char*) malloc(sizeof(char)*(tam_escola)+1);
+          nome_escola[tam_escola] = '\0';
+          fread(nome_escola, tam_escola, 1, f);
 
-		    if(strcmp(nome_escola,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
-	else if(strcmp(campo, "municipio")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,((i*87)+16),SEEK_CUR);
+        if(strcmp(nome_escola,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "municipio")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,((i*87)+16),SEEK_CUR);
 
-          	//Andando pelo registro até chegar no campo municipio
-          	fread(&tam_escola, sizeof(int), 1, f);
-          	fseek(f,tam_escola,SEEK_CUR);
-          	fread(&tam_mun, sizeof(int), 1, f);
-          	muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
-          	muni[tam_mun] = '\0';
-         	fread(muni, tam_mun, 1, f);
+            //Andando pelo registro até chegar no campo municipio
+            fread(&tam_escola, sizeof(int), 1, f);
+            fseek(f,tam_escola,SEEK_CUR);
+            fread(&tam_mun, sizeof(int), 1, f);
+            muni = (char*) malloc(sizeof(char)*(tam_mun)+1);
+            muni[tam_mun] = '\0';
+          fread(muni, tam_mun, 1, f);
 
-		    if(strcmp(muni,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		  	i++;
-		}
-	}
-	else if(strcmp(campo, "prestadora")==0){
-		//Leitura de todos os registros
-		while(!feof(f)){
-			if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
-      	 	fseek(f,(i*87)+16,SEEK_CUR);
+        if(strcmp(muni,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
+  else if(strcmp(campo, "prestadora")==0){
+    //Leitura de todos os registros
+    while(!feof(f)){
+      if(i>0)fseek(f,5,SEEK_SET);//posicionando o ponteiro pro primeiro registro
+          fseek(f,(i*87)+16,SEEK_CUR);
 
-          	//Andando pelo registro até chegar no campo prestadora
-          	fread(&tam_escola, sizeof(int), 1, f);
-			fseek(f,tam_escola,SEEK_CUR);
-          	fread(&tam_mun, sizeof(int), 1, f);
-          	fseek(f,tam_mun,SEEK_CUR);
-          	fread(&tam_prest, sizeof(int), 1, f);
-          	prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
-          	prest[tam_prest] = '\0';
-          	fread(prest, tam_prest, 1, f);
+            //Andando pelo registro até chegar no campo prestadora
+            fread(&tam_escola, sizeof(int), 1, f);
+      fseek(f,tam_escola,SEEK_CUR);
+            fread(&tam_mun, sizeof(int), 1, f);
+            fseek(f,tam_mun,SEEK_CUR);
+            fread(&tam_prest, sizeof(int), 1, f);
+            prest = (char*) malloc(sizeof(char)*(tam_prest)+1);
+            prest[tam_prest] = '\0';
+            fread(prest, tam_prest, 1, f);
 
-		    if(strcmp(prest,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
-		    i++;
-		}
-	}
+        if(strcmp(prest,valor)==0)busca_rrn(i);//chama a funcao pra printar o registro que satisfaz
+        i++;
+    }
+  }
 
     fclose(f);  //Fecha o arquivo
 }
 
+/* *********************
+********* T2 ***********
+********************** */
 
+//Indice
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
 
-    //Criando o arquivo de dados chamado de (teste.bin)
+    //Criando o arquivo de indices chamado de (arvoreB.bin)
     b = fopen("arvoreB.bin", "wb");
     verifica_arquivo(b, CARREGANDO);
 
@@ -725,15 +734,19 @@ FILE* criar_indice(Registro *reg, int qtdRegs){
     return b;
 }
 
-//Funcao para criar o cabealho no arquivo de arvore B
+//Funcao para carregar o arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs){
-    FILE* b;
-    int tamAtual;
+    FILE *b;
+    bPool *bp;  //Tem que ver se é *bp ou só bp (dai passa & nas funcoes)
+    arvoreB *root = NULL;
+    int tamAtual = 0;       //Numero de nós na árvore
+    int i, j = 0;
+
     b = fopen("arvoreB.bin", "w+b");
 
     //Cria um cabecalho auxiliar
     Cabecalho_B cab;
-    cab.status = '1';           //consistente
+    cab.status = '0';           //consistente
     cab.noRaiz = -1;            //Arvore vazia por enquanto
     cab.altura = 0;
     cab.ultimoRRN = -1;
@@ -744,320 +757,316 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     fwrite(&cab.noRaiz,sizeof(int),1,b);
     fwrite(&cab.altura,sizeof(int),1,b);
     fwrite(&cab.ultimoRRN,sizeof(int),1,b);
-    printf("cab.status %c\n", cab.status);
+    /*printf("cab.status %c\n", cab.status);
     printf("cab.noRaiz %d\n", cab.noRaiz);
     printf("cab.altura %d\n", cab.altura);
-    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);
+    printf("cab.ultimoRRN %d\n", cab.ultimoRRN);*/
 
-    fclose(b);
+    //Inicializando a ArvoreB
+    root = (arvoreB *) realloc(root, sizeof(arvoreB) * (tamAtual + 1));
+    tamAtual++; //=1
+    root->n = 0;
+    for(i = 0;i < 9;i++){
+        root->p[i] = -1;
+        root->c[i] = -1;
+        root->pr[i] = -1;
+    }
+    root->pr[i] = -1;
 
+    //Inicializando o buffer pool
+    bp = (bPool *) calloc(1, sizeof(bPool));
+    for(i = 0;i < TAM_BUFFER;i++){
+        bp->RRN[i] = -1;
+        bp->freq[i] = 0;
+    }
+ 
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < 9; i++){
-      printf("%d\n", i);
-      inserir_B(reg[i], i);
+    for(int i = 0; i < 10; i++){
+        inserir_B(b, reg[i], i, bp); 
     }
 
-    //-----------------SÓ PRA TESTAR-----------------------
-    b = fopen("arvoreB.bin", "rb");
-    fseek(b, 13 + 4 + 4 + 4, SEEK_SET);
-    int resp;
-    fread(&resp, sizeof(int), 1, b);
-    printf("RESP = %d\n", resp);
-}
-
-void inserir_B(Registro reg, int RRN_reg){
-    FILE *b;
-    int i, j;
-    Cabecalho_B cab;
-    arvoreB node;
-
-    //Lendo o arquivo o arquivo da arvore B
-    b = fopen("arvoreB.bin", "r+b");
-    fseek(b, 0, SEEK_SET);
-    //TUDO CABEÇALHO
-    //Alterar o status
-    char status = '1';
-    fread(&status, sizeof(char), 1, b);
-    printf("status %c\n", status);
-    cab.status = status;
-
-    //Lendo o no raiz
-    int rrn_no_raiz;
-    fread(&rrn_no_raiz, sizeof(int), 1, b);
-    printf("rrn_no_raiz %d\n", rrn_no_raiz);
-    cab.noRaiz = rrn_no_raiz;
-
-    //Lendo a altura da arvore
-    int altura_B;
-    fread(&altura_B, sizeof(int), 1, b);
-    printf("altura_B %d\n", altura_B);
-    cab.altura = altura_B;
-
-    //Lendo o ultimo RRN da arvore
-    int lastRRN;
-    fread(&lastRRN, sizeof(int), 1, b);
-    printf("lastRRN %d\n", lastRRN);
-    cab.ultimoRRN = lastRRN;
-
-    //Checar se a arvore esta vazia
-    if(rrn_no_raiz == -1){
-      //volta para o inicio pulando o status
-      fseek(b, 1, SEEK_SET);
-      //atualiza o no raiz
-      cab.noRaiz = 0;
-      fwrite(&cab.noRaiz, sizeof(int), 1, b);
-      //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
-      fseek(b, sizeof(int), SEEK_CUR);
-      //atualiza ultimoRRN
-      cab.ultimoRRN = 0;
-      fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
-
-      //Insere primeiro registro
-      node.n = 1;
-      node.p;
-      for(i = 0; i < 10; i++) node.p[i] = -1;
-      node.c[0] = reg.codINEP;
-      node.pr[0] = RRN_reg;
-      fwrite(&node.n, sizeof(int), 1, b);
-      fwrite(&node.p[0], sizeof(int), 1, b);
-      fwrite(&node.c[0], sizeof(int), 1, b);
-      fwrite(&node.pr[0], sizeof(int), 1, b);
-
-      //Seta os demais ponteiros como -1
-      for(i = 1; i < 9; i++){
-        fwrite(&node.p[i], sizeof(int), 1, b);
-        //pula c[i] e pr[i](8 bytes)
-        fseek(b, 2*sizeof(int), SEEK_CUR);
-      }
-      fwrite(&node.p[9], sizeof(int), 1, b);
-    }else{
-        //Vai para o indice indicado no no raiz
-        fseek(b, TAM_NO_INDICE*rrn_no_raiz, SEEK_CUR);
-
-        //Verifica o valor de n
-        int n_no;
-        fread(&n_no, sizeof(int), 1, b);
-        printf("n_no = %d\n", n_no);
-
-        //Checa se o no está cheio
-        if(n_no == 9){
-        	//atualiza o cabeçalho pulando o char
-        	fseek(b, 1, SEEK_SET);
-        	//atualiza o noRaiz;
-        	cab.noRaiz = cab.ultimoRRN + 1;
-        	fwrite(&cab.noRaiz, sizeof(int), 1, b);
-        	//atualiza a altura da arvore
-        	cab.altura++;
-        	fwrite(&cab.altura, sizeof(int), 1, b);
-        	//atualiza o ultimoRRN
-        	cab.ultimoRRN++;
-        	fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
-
-        	//aloca o novo nó
-        	//vai até o ultimo RRN
-        	fseek(b, cab.ultimoRRN*TAM_NO_INDICE, SEEK_CUR);
-            //Escreve o n do nó
-            int aux_zero = 0;
-            int aux_m1 = -1;
-        	fwrite(&aux_zero, sizeof(int), 1, b);
-        	//Atualiza p[0] como a antiga raiz
-            fwrite(&rrn_no_raiz, sizeof(int), 1, b);
-            for(i = 1;i < n_no;i++){
-                fseek(b, 8, SEEK_CUR);
-                fwrite(&aux_m1, sizeof(int), 1, b);
-            }
-        	//Faz o split da antiga raiz
-        	//split_B();
-        	//Insere o novo item no nó que foi splitado
-        	//insere_naoCheio();
-        }
-        else{
-        	//Insere na raiz
-        	insere_naoCheio_B(cab.noRaiz, reg, RRN_reg);
-        }
-    }
-/*
-        Pseudocódigo Cormen:
-
-        B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
-    			if(n[raiz]==9){
-    				aloca novaRaiz	//no nosso caso seria achar o proximo espaço vazio no arquivo
-    				cab.raiz = novaRaiz	//atualiza o cabeçalho
-    				n[novRaiz] = 0
-    				p1[novaRaiz] = raiz(antiga)
-    				SPLIT(novaRaiz, 5, raiz(antiga))
-    				B-TREE-INSERT-NONFULL(raiz, k)
-    			}
-    			else B-TREE-INSERT-NONFULL(raiz, k)
-        }
-    */
-
-    //Atualizando o status
-    fseek(b,0,SEEK_SET);
-    status = '0';
-    fwrite(&status, sizeof(char), 1, b);
+    printa_bPool(bp);
 
     fclose(b);
 }
 
-int ordena_no_B(arvoreB *node, Registro reg, int qtd){
-	  int i = qtd;
-
-    while(i >= 0 && reg.codINEP < node->c[i]){
-        node->p[i] = node->p[i-1];
-        node->c[i] = node->c[i-1];
-        node->pr[i] = node->pr[i-1];
-        i--;
+void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
+  /*
+    Pseudocódigo Cormen:
+    B-TREE-INSERT(k, T){ //k = nova chave, T = Arvore B
+            if(n[raiz]==9){
+                aloca novaRaiz  //no nosso caso seria achar o proximo espaço vazio no arquivo
+                cab.raiz = novaRaiz //atualiza o cabeçalho
+                n[novRaiz] = 0
+                p1[novaRaiz] = raiz(antiga)
+                SPLIT(novaRaiz, 0, raiz(antiga))
+                swapPosição(raiz(antiga), novaRaiz)
+                B-TREE-INSERT-NONFULL(novaRaiz, k)
+            }
+            else B-TREE-INSERT-NONFULL(raiz, k)
     }
+    */
+  int i;
+  Cabecalho_B cab;
 
-    printf("i = %d\n", i);
+  fseek(b, 0, SEEK_SET);
+  //TUDO CABEÇALHO
+  //Alterar o status
+  cab.status = '0';
+  fwrite(&cab.status, sizeof(char), 1, b);
+  printf("cab.tatus %c\n", cab.status);
 
-    for (int j = 0; j <= qtd; j++){
-      printf("node->p[%d] = %d\n", j, node->p[j]);
-      printf("node->c[%d] = %d\n", j, node->c[j]);
-      printf("node->pr[%d] = %d\n", j, node->pr[j]);
+  //Lendo o no raiz
+  fread(&cab.noRaiz, sizeof(int), 1, b);
+  printf("cab.noRaiz %d\n", cab.noRaiz);
+
+  //Lendo a altura da arvore
+  fread(&cab.altura, sizeof(int), 1, b);
+  printf("cab.altura %d\n", cab.altura);
+
+  //Lendo o ultimo RRN da arvore
+  fread(&cab.ultimoRRN, sizeof(int), 1, b);
+  printf("cab.ultimoRRN %d\n\n", cab.ultimoRRN);
+
+  //Se a arvore estiver vazia
+  if(cab.noRaiz == -1){
+    //printf("antes do buffer\n");
+    //volta para o inicio pulando o status
+    fseek(b, 0, SEEK_SET);
+    fread(&cab.status, sizeof(char), 1, b);
+    //atualiza o no raiz
+    cab.noRaiz = 0;
+    fwrite(&cab.noRaiz, sizeof(int), 1, b);
+    //pula a altura                       --(nao sei se altura inicial é 0 ou 1)--
+    fread(&cab.altura, sizeof(int), 1, b);
+    //atualiza ultimoRRN
+    cab.ultimoRRN = 0;
+    fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+    //aloca a raiz
+    arvoreB* raiz = (arvoreB *) calloc(1, sizeof(arvoreB));
+    raiz->n = 1;
+    for(i = 0;i < 9;i++){
+        raiz->p[i] = -1;
+        raiz->c[i] = -1;
+        raiz->pr[i] = -1;
     }
+    raiz->pr[i] = -1;
 
-    return i;
+    //Insere nova chave
+    raiz->c[0] = reg.codINEP;
+    raiz->pr[0] = RRN_reg;
+    //Coloca no buffer
+    put(b, cab.ultimoRRN, raiz, bp);
+  }
+  else if(bp->node[0].n == 9){  //Checa no buffer se a raiz está cheia
+    //aloca novaRaiz
+    arvoreB* novaRaiz = (arvoreB *) calloc(1, sizeof(arvoreB));
+    novaRaiz->n = 0;
+    for(i = 0;i < 9;i++){
+        novaRaiz->p[i] = -1;
+        novaRaiz->c[i] = -1;
+        novaRaiz->pr[i] = -1;
+    }
+    novaRaiz->pr[i] = -1;
+
+    //Coloca raiz antiga como filha
+    novaRaiz->p[0] = bp->RRN[0];
+
+    //Alterando o cabeçalho do arquivo por causa da nova raiz
+    fseek(b, 1, SEEK_SET);
+    //atualiza o no raiz e salva o RRN do no raiz antigo
+    cab.noRaiz = cab.ultimoRRN + 1;
+    fwrite(&cab.noRaiz, sizeof(int), 1, b);
+    //atualiza a altura
+    cab.altura++;
+    fwrite(&cab.altura, sizeof(int), 1, b);
+    //atualiza ultimoRRN
+    cab.ultimoRRN++;
+    fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+
+    //aplica o split da raiz antiga
+    split_B(b, bp, novaRaiz, cab.noRaiz, 0, &bp->node[0], bp->RRN[0]);
+
+    //Coloca a novaRaiz no slot 0 do buffer
+    //swapRaiz(cab.noRaiz, bp);
+
+    //Insere nova chave
+    bp->freq[1]++;
+    insere_naoCheio_B(b, &bp->node[1], cab.noRaiz, reg, RRN_reg, bp);
+  }
+  else{
+    bp->freq[0]++;
+    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
+  } 
 }
 
-void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg){
-    FILE *b;
-    int qtd;
-    arvoreB node;
-    Cabecalho_B cab;
-    int i, pos;
-
-    b = fopen("arvoreB.bin", "r+b");
-    //move o ponteiro para o nó desejado
-    fseek(b, rrn_no*TAM_NO_INDICE + sizeof(Cabecalho_B) - 3, SEEK_SET);
-
-    //lê a quantidade de chaves no nó
-    fread(&node.n, sizeof(int), 1, b);
-    //printf("node.n = %d\n", node.n);
-    qtd = node.n;
-
-    //lê todas as chaves/ponteiros do nó
-    for(i = 0;i < qtd;i++){
-        fread(&node.p[i], sizeof(int), 1, b);
-        fread(&node.c[i], sizeof(int), 1, b);
-        fread(&node.pr[i], sizeof(int), 1, b);
-    }
-    //lê o último ponteiro
-    fread(&node.p[i], sizeof(int), 1, b);
-
-    //verifica o primeiro ponteiro
-    if(node.p[0] == -1){    //-1 significa que é nó folha
-        pos = ordena_no_B(&node, reg, qtd);
-        node.c[pos] = reg.codINEP;
-        node.pr[pos] = RRN_reg;
-        node.n++;
-        printf("O N eh %d\n", node.n);
-        //Retorna ao inicio do nó
-        fseek(b, rrn_no*TAM_NO_INDICE+sizeof(Cabecalho_B) - 3, SEEK_SET);
-        //Reescreve o nó atualizado no arquivo
-        fwrite(&node.n, sizeof(int), 1, b);
-        printf("POS = %d\n", pos);
-        for(i=pos; i<node.n; i++){
-          fseek(b, sizeof(int), SEEK_CUR);
-          fwrite(&node.c[i], sizeof(int), 1, b);
-          fwrite(&node.pr[i], sizeof(int), 1, b);
-        }
-        fclose(b);
-    }else{					//não é nó folha
-		//procura o ponteiro que irá "descer"
-		while(qtd >= 0 && reg.codINEP < node.c[qtd])	qtd--;
-		qtd++;
-		//posiciona o leitor no nó correto
-		fseek(b, sizeof(Cabecalho_B), SEEK_SET);
-		fseek(b,  node.p[qtd]*TAM_NO_INDICE, SEEK_CUR);
-		//armazena o n do nó
-		fread(&qtd, sizeof(int), 1, b);
-		//verifica se o nó está cheio
-		if(qtd == 9){ //talvez seja 8
-			//split_B();
-			//if(reg.codINEP > node.c[qtd]) qtd++; //nao sei se precisa
-		}
-
-    //recursao
-    insere_naoCheio_B(node.p[qtd], reg, RRN_reg);
-	}
-
+void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
   /*
   B-TREE-INSERT-NONFULL(x, k){ //x = nó, k = nova chave
-          i = n[x]
-          if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
-            while(i>=0 && k<ci[x]){
-              ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
-              i--
-            }
-            ci+1[x] = k
-            n[x]++
-          }
-          else{
-            while(i>=0 && k<ci[x])
-              i--
-            i++
-            FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
-            if(n[pi[x]] == 9){
-              SPLIT(x, i+1, pi[x])
-              if(k > ci[x]) i++ (?)
-            }
-            B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
-          }
-        }
+        - get(no) //através do RRN
+        - i = n[x]
+        - if(p1[x] == -1){ //se p1 for nulo, ou seja, se o nó for uma folha
+        - while(i>=0 && k<ci[x]){
+        -   ci+1[x] = ci[x] //no nosso caso é escrever tudo 4 bytes pra frente(incluindo c, pr e p)
+        -   i--
+        - }
+        - ci+1[x] = k
+        - n[x]++
+        - }
+        - else{
+        - while(i>=0 && k<ci[x])
+        -   i--
+        - i++
+        - FSEEK(pi[x]) //pula até o filho do no x no arquivo de indice
+        - if(n[pi[x]] == 9){
+        -   SPLIT(b, bp, x, RRN_indiceX, i, pi[x])
+        -   if(k > ci[x]) i++ (?)
+        - }
+        - B-TREE-INSERT-NONFULL(pi[x], k) //recursao até chegar em um nó folha
+        - }
+    }
   */
+  int pos, posBuffer;
+  pos = x->n - 1;
+
+  //checa se x é um no folha
+  if(x->p[0] == -1){
+    while(pos>=0 && reg.codINEP < x->c[pos]){ //insere a nova chave ordenadamente
+      x->c[pos+1] = x->c[pos];
+      x->pr[pos+1] = x->pr[pos];
+      pos--;
+    }
+    x->c[pos+1] = reg.codINEP;
+    x->pr[pos+1] = RRN_reg;
+    x->n++;
+  }
+  else{ //Se x não for uma  folha
+    while(pos >= 0 && reg.codINEP < x->c[pos])
+      pos--;
+    pos++;
+
+    //Faz um get no filho desejado
+    posBuffer = get(b, x->p[pos], bp);
+
+    //Após ter a posição do filho no buffer, verifica se ele está cheio
+    if(bp->node[posBuffer].n == 9){
+      split_B(b, bp, x, RRN_indiceX, pos, &bp->node[posBuffer], bp->RRN[posBuffer]);
+      if(reg.codINEP > x->c[pos]) pos++;
+    }
+    insere_naoCheio_B(b, &bp->node[posBuffer], bp->RRN[posBuffer], reg, RRN_reg, bp);
+  }
 }
 
 //Funcao de split para a insercao na arvore B
-void split_B(){
+void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio){
   /*
   SPLIT(no pai, i, no filhoCheio){
-         aloca novoNo //aloca no ultimoRRN+1
-          n[novoNo] = 4
-
-          for(j = 0; j++; j<4){}
-              cj[novoNo] = cj+5[filhoCheio]
-              prj[novoNo] = prj+5[filhoCheio]
-          }
-
-          if(p0[filhoCheio] != -1){ //checa se nao é no folha
-            for(j=0; j++; j<5)
-              pj[novoNo] = pj+5[filhoCheio]
-          }
-          n[filhoCheio] = 4
-
-          for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
-            pj+1[pai] = pj[pai]
-          }
-          //atençao que é i e nao j aqui embaixo
-          pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
-
-          for(j = n[pai]-1; j--; j<i)
-            cj+1[pai] = cj[pai]
-            prj+1[pai] = prj[pai]
-          }
-          ci-1[pai] = c4[filhoCheio]
-          pri-1[pai] = pr4[filhoCheio]
-
+         - aloca novoNo //aloca no ultimoRRN+1
+         - n[novoNo] = 4
+         - for(j = 0; j++; j<4){
+         -   cj[novoNo] = cj+5[filhoCheio]
+         -   prj[novoNo] = prj+5[filhoCheio]
+         - }
+         - if(p0[filhoCheio] != -1){ //checa se nao é no folha
+         -   for(j=0; j++; j<5)
+         -     pj[novoNo] = pj+5[filhoCheio]
+         - }
+         - n[filhoCheio] = 4
+         - for(j=n[pai]; j--; j <=i){  //ordena os ponteiros do no pai até o espaco do novo ponteiro
+         -   pj+1[pai] = pj[pai]
+         - }
+         - //atençao que é i e nao j aqui embaixo
+         - pi[pai] = rrn de novoNo  //(nosso caso será o ultimoRRN)
+         - for(j = n[pai]-1; j--; j<i){
+         -   cj+1[pai] = cj[pai]
+         -   prj+1[pai] = prj[pai]
+         - }
+          ci[pai] = c4[filhoCheio]
+          pri[pai] = pr4[filhoCheio]
           n[pai]++
-
-          ESCREVE(novoNo)
-          ESCREVE(pai)
-          ESCREVE(filhoCheio)
+          put(filhoCheio)
+          put(novoNo)
+          put(pai)
         }
   */
+  int i;
+  Cabecalho_B cab;
 
+  //Pula até o ultimo RRN
+  fseek(b, 9, SEEK_SET);
+
+  //Lendo o ultimo RRN da arvore
+  fread(&cab.ultimoRRN, sizeof(int), 1, b);
+  printf("cab.ultimoRRN do split %d\n", cab.ultimoRRN);
+
+  //aloca novo nó
+  arvoreB* new = (arvoreB *) calloc(1, sizeof(arvoreB));
+  new->n = 0;
+  for(i = 0;i < 9;i++){
+      new->p[i] = -1;
+      new->c[i] = -1;
+      new->pr[i] = -1;
+  }
+  new->pr[i] = -1;
+
+  //Atualiza o ultimo RRN
+  fseek(b, -4, SEEK_CUR);
+  cab.ultimoRRN++;
+  fwrite(&cab.ultimoRRN, sizeof(int), 1, b);
+
+  new->n = 4;
+
+  //Copia as chaves da segunda metade do filhoCheio para o novo nó
+  for(i = 0; i < 4; i++){
+      new->c[i] = filhoCheio->c[i+5];
+      new->pr[i] = filhoCheio->pr[i+5];
+  }
+
+  //checa se filhoCheio nao é no folha
+  if(filhoCheio->p[0] != -1){
+    for(i = 0; i < 5; i++)
+      new->p[i] = filhoCheio->p[i+5];
+  }
+  filhoCheio->n = 4;
+  new->n = 4;
+
+  //ordena os ponteiros do no pai até o espaco do novo ponteiro
+  //printf("pai->n = %d || pont+1 = %d\n", pai->n, pont+1);
+  for(i = pai->n; i >= pont+1; i--)
+    pai->p[i+1] = pai->p[i];
+
+  //ponteiro de pai recebe o rrn do novo no (do lado do no do irmao)
+  pai->p[pont+1] = cab.ultimoRRN;
+
+  //ordena as chaves de pai até a posicao desejada
+  for(i = pai->n-1; i >= pont; i--){
+    pai->c[i+1] = pai->c[i];
+    pai->pr[i+1] = pai->pr[i];
+  }
+
+  //insere a chave do filhoCheio no pai
+  pai->c[pont] = filhoCheio->c[4];
+  pai->pr[pont] = filhoCheio->pr[4];
+
+  pai->n++;
+
+  //insere os nos alterados no buffer
+  //printf("RRNfilhoCheio no split -  %d", RRN_filhoCheio);
+  put(b, RRN_filhoCheio, filhoCheio, bp);
+  //printf("RRN_pai no split -  %d", RRN_pai);
+  put(b, RRN_pai, pai, bp);
+  //printf("RRNnovo no split -  %d", cab.ultimoRRN);
+  put(b, cab.ultimoRRN, new, bp);
 }
 
 void pesquisa_B(){
   /*
     PESQUISA(no x, int k){
       int i = 0
-
       FSEEK PULANDO CABECALHO
       FSEEK x*TAMANHO_INDICE
-
       fread(n[x])
       fread[p[0]]
       fread(c[0])
@@ -1069,12 +1078,10 @@ void pesquisa_B(){
         fread(pr[i])
       }
       fread[p[i]]
-
       if(i<n[x] && k == c[i]){
         busca(c[i] ou pr[i]) //busca essa chave no arquivo de dados
         return
       }
-
       if(p[0] == -1){
         printf(nao encontrado)
         return
@@ -1089,11 +1096,11 @@ void pesquisa_B(){
  * BUFFER POOL
  */
 
-arvoreB* get(int RRN, bPool* bufPool){
+int get(FILE *b, int RRN, bPool *bufPool){
 
     //if esta no bufferpool
         //1: copie o conteúdo da página requerida para uma variável auxiliar do tipo arvoreB, chamada P
-        //2: realize possíveis restruturações na organização do buffer (LFU)
+        //2: realize possíveis reestruturações na organização do buffer (LFU)
         //3: retorne P
 
     //else nao esta no buffer
@@ -1101,27 +1108,201 @@ arvoreB* get(int RRN, bPool* bufPool){
         //2: insira P no buffer, chamando a função put
         //3: retorne P.
 
+    arvoreB *aux;
+    int i, j, resp;
+
+    aux = (arvoreB *) calloc(1, sizeof(arvoreB));
+
+    //Página está no buffer
+    for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
+        if(bufPool->RRN[i] == RRN){         //RRN está no buffer
+            aux->n = bufPool->node[i].n;    
+            for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
+                //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+                aux->p[j] = bufPool->node[i].p[j];
+                aux->c[j] = bufPool->node[i].c[j];
+                aux->pr[j] = bufPool->node[i].pr[j];
+            }
+            aux->p[j] = bufPool->node[i].p[j];          //Copia o último ponteiro (n+1)
+            bufPool->freq[i]++;                         //Atualiza a frequência
+
+            return i;                                   //Sai do for() e retorna o indice do buffer
+        }
+    }
+
+    //Página não está no buffer
+    //Verifica se percorreu todo o buffer
+    if(i == TAM_BUFFER){
+        //Checar cabeçalho
+        //Pulando o cabeçalho
+        fseek(b, TAM_CAB_INDICE, SEEK_SET);
+        //Indo pro RRN desejado
+        fseek(b, RRN*TAM_NO_INDICE, SEEK_CUR);
+
+        //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+        fread(&aux->n, 1, sizeof(int), b);
+        for(j = 0;j < bufPool->node[i].n;j++){          //Roda por todos os registros do nó
+            fread(&aux->p[i], 1, sizeof(int), b);
+            fread(&aux->c[i], 1, sizeof(int), b);
+            fread(&aux->pr[i], 1, sizeof(int), b);
+        }
+        fread(&aux->p[i], 1, sizeof(int), b);           //Copia o ultimo ponteiro (n+1)
+
+        //Coloca no buffer
+        resp = put(b, RRN, aux, bufPool);
+    }
+
+    return resp;
+
 }
 
-void put(int RRN, arvoreB* page, bPool* bufPool){
-
+int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
+    printf("RRN = %d\n", RRN);
     //if nao esta no buffer POOL
-        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P
+        //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
         //3: caso contrário : remova uma página N do buffer e insira P (LFU)
 
     //else se esta no buffer
-        //1: recuper e a página armazenada no buffer e atualize seu conteúdo
+        //1: recupere a página armazenada no buffer e atualize seu conteúdo
         //2: marque que P é uma página modificada
         //3: reorganize a estrutura interna do buffer (LFU)
 
+    int i, j;
+    int isVazio = -1;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
+    //Variáveis pra localizar o menos utilizado (LFU)
+    int menor = INT_MAX;      
+    int pos = -1;
+    int aux;
+
+    //Página está no buffer
+    for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
+        //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
+        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
+        if(bufPool->RRN[i] == RRN){
+            for(j = 0;j < 9;j++){
+                bufPool->node[i].p[j] = page->p[j];
+                bufPool->node[i].c[j] = page->c[j];
+                bufPool->node[i].pr[j] = page->pr[j];
+            }
+            bufPool->node[i].p[j] = page->p[j];         //Copia o último ponteiro (n+!)
+            bufPool->freq[i]++;                         //Atualiza a frequencia
+
+            return i;                                   //Sai do for() e retorna a posição no buffer
+        }
+    }
+
+    //Página não está no buffer
+    //Verifica se percorreu todo o buffer
+    if(i == TAM_BUFFER){
+        if(isVazio != -1){
+            printf("isVazio = %d\n", isVazio);
+            //Copia a pagina pro buffer
+            bufPool->node[isVazio].n = page->n;
+            for(j = 0;j < 9;j++){
+                bufPool->node[isVazio].p[j] = page->p[j];
+                bufPool->node[isVazio].c[j] = page->c[j];
+                bufPool->node[isVazio].pr[j] = page->pr[j];
+            }
+            bufPool->node[isVazio].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+            bufPool->freq[isVazio] = 1;
+            bufPool->RRN[isVazio] = RRN;
+
+            return isVazio;
+        }else{
+            //Acha a página menos frequentada tirando a raiz
+            for(j = 1;j < TAM_BUFFER;j++){
+                if(bufPool->freq[j] < menor){
+                    menor = bufPool->freq[i];
+                    pos = j;
+                }
+            }
+
+            //Escreve a página no arquivo de índice
+            flush(b, bufPool->node[pos], bufPool->RRN[pos], bufPool);
+
+            //Troca a página menos frequentada
+            bufPool->node[pos].n = page->n;
+            for(j = 0;j < 9;j++){
+                bufPool->node[pos].p[j] = page->p[j];
+                bufPool->node[pos].c[j] = page->c[j];
+                bufPool->node[pos].pr[j] = page->pr[j];
+            }
+            bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
+            bufPool->freq[pos] = 1;                           //Primeiro acesso
+            bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
+        } 
+    }
+
+    return pos;
 }
 
 void flush_full(bPool* bufPool){
     //Escrever no disco todas as paginas com modificacoes presentes no buffer
 }
 
-void flush(arvoreB* page, bPool* bufPool){
+void flush(FILE *b, arvoreB page, int RRN, bPool* bufPool){
     //Escrever no disco uma pagina que foi modificada
     //Sempre chamada durante a realizacao as trocas de pagina a serem armazenadas no buffer
+    int i;
+    char status = 0;
+
+    //Altera os status
+    fseek(b, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, b);
+
+    //move o ponteiro para o nó desejado
+    fseek(b, RRN*TAM_NO_INDICE + sizeof(Cabecalho_B) - 1, SEEK_SET);
+
+    //Armazena a pagina a ser trocada do buffer no arquivo
+    fwrite(&page.n, sizeof(int), 1, b);
+    for(i = 0; i < 9; i++){
+      fwrite(&page.p[i], sizeof(int), 1, b);
+      fwrite(&page.c[i], sizeof(int), 1, b);
+      fwrite(&page.pr[i], sizeof(int), 1, b);
+    }
+    fwrite(&page.pr[i], sizeof(int), 1, b);    //Ultimo ponteiro (n+1)
+
+    //Altera os status
+    status = 1;
+    fseek(b, 0, SEEK_SET);
+    fwrite(&status, sizeof(char), 1, b);
+
+    fclose(b);
+}
+
+//Função para colocar a nova raiz na posição certa do buffer
+void swapRaiz(int RRN_novaRaiz, bPool* bp){
+  int i;
+  arvoreB aux;
+  int auxRRN;
+
+  for(i = 1; i < TAM_BUFFER; i++){
+    if(bp->RRN[i] == RRN_novaRaiz) break;
+  }
+
+  auxRRN = bp->RRN[0];
+  bp->RRN[0] = bp->RRN[i];
+  bp->RRN[i] = auxRRN;
+
+  aux = bp->node[0];
+  bp->node[0] = bp->node[i];
+  bp->node[i] = aux;
+}
+
+//Função para printar a bufferpool inteira
+void printa_bPool(bPool* bp){
+  int i, j;
+
+  for (i = 0; i < TAM_BUFFER; i++){
+    printf("freq-%d || RRN-%d || ", bp->freq[i], bp->RRN[i]);
+    printf("%d -> ", bp->node[i].n);
+    for (j = 0; j < bp->node[i].n; j++){
+      printf("%d ", bp->node[i].p[j]);
+      printf("%d ", bp->node[i].c[j]);
+      printf("%d / ", bp->node[i].pr[j]);
+    }
+    printf("%d", bp->node[i].p[j]);
+    printf("\n");
+  }
 }

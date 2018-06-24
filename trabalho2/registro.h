@@ -2,6 +2,7 @@
 #define REGISTRO_H
 #include <stdio.h>
 
+
 //Definindo o tamanho do registro
 #define TAM_REG 87
 //Definindo o delimitador de campo
@@ -59,13 +60,15 @@ void busca_rrn_parametro(char* campo, char* valor);
  */
 
  #define TAM_NO_INDICE 116
+ #define TAM_CAB_INDICE 13
+ #define TAM_BUFFER 5
 
  //Definindo o cabecalho do arquivo de arvore B
  typedef struct{
-      char status;
       int noRaiz;
       int altura;
       int ultimoRRN;
+      char status;
  } Cabecalho_B;
 
  /*
@@ -82,31 +85,32 @@ void busca_rrn_parametro(char* campo, char* valor);
      int p[10];
      int c[9];
      int pr[9];
- } arvoreB;
+ } arvoreB; 
 
 //Definindo a estrutura da bufferpool
 typedef struct{
-    arvoreB[5];
-    int RRN[5]; //Auxiliar para saber onde sera escrito no arquivo de indice
-    int freq[5];
-}bPool;
-
-
+    arvoreB node[TAM_BUFFER];
+    int RRN[TAM_BUFFER];         //Auxiliar para saber onde sera escrito no arquivo de indice
+    int freq[TAM_BUFFER];
+} bPool;
 
  /*
   *  FUNCOES
   */
 
+//ArvoreB
 FILE* criar_indice(Registro *reg, int qtdRegs);
 void criar_arvore_B(Registro *reg, int qtdRegs);
-void inserir_B(Registro reg, int RRN_reg);
-int ordena_no_B(arvoreB *node, Registro reg, int qtd);
-void insere_naoCheio_B(int rrn_no, Registro reg, int RRN_reg);
+void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
+void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp);
+void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio);
 
 //Buffer pool
-arvoreB* get(int RRN, bPool* bufPool);
-void put(int RRN, arvoreB* page, bPool* bufPool);
-void flush_full(bPool* bufPool);
-void flush(arvoreB* page, bPool* bufPool);
+int get(FILE *b, int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
+int put(FILE *b, int RRN, arvoreB* page, bPool *bufPool);   //Armazena página no buffer
+void flush_full(bPool *bufPool);                            //Manda todas as páginas pro arquivo
+void flush(FILE *b, arvoreB page, int RRN, bPool *bufPool); //Manda uma página específica pro arquivo
+void swapRaiz(int RRN_novaRaiz, bPool* bp);                 //Coloca a nova raiz na posição certa do buffer
+void printa_bPool(bPool* bp);                               //Printa o bufferpool inteiro
 
 #endif
