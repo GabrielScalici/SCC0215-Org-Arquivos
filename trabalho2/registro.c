@@ -782,8 +782,8 @@ void criar_arvore_B(Registro *reg, int qtdRegs){
     }
  
     //insere todos os registros do arquivo de dados no arquivo de indices
-    for(int i = 0; i < qtdRegs; i++){
-        inserir_B(b, reg[i], i, bp); 
+    for(int i = 0; i < 20; i++){
+      inserir_B(b, reg[i], i, bp); 
     }
 
     printa_bPool(bp);
@@ -900,8 +900,9 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   }
   else{
     bp->freq[0]++;
-    insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
+    insere_naoCheio_B(b, &bp->node[1], cab.noRaiz, reg, RRN_reg, bp);   
   } 
+
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
@@ -1067,6 +1068,7 @@ void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* f
   put(b, RRN_pai, pai, bp);
   //printf("RRNnovo no split -  %d", cab.ultimoRRN);
   put(b, cab.ultimoRRN, new, bp);
+  printf("\n\nPOS SPLIT \n\n");
 }
 
 void pesquisa_B(){
@@ -1169,7 +1171,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
 }
 
 int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
-    printf("RRN = %d\n", RRN);
+    printf("RRN do put = %d\n", RRN);
     //if nao esta no buffer POOL
         //1: copie o conteúdo da página para uma variável auxiliar do tipo IndexPage, chamada P  (Não vi necessidade)
         //2: se o buffer conter espaço disponível : insira P no espaço disponível
