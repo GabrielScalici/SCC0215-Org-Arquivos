@@ -720,6 +720,8 @@ void busca_rrn_parametro(char* campo, char* valor){
 ********* T2 ***********
 ********************** */
 
+int hit, fault;
+
 //Indice
 FILE* criar_indice(Registro *reg, int qtdRegs){
     FILE* b;
@@ -809,6 +811,11 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     */
   int i;
   Cabecalho_B cab;
+  FILE *fp;             //Arquivo buffer-info
+
+    //Inicializa as variáveis auxiliares
+    hit = 0;
+    fault = 0;
 
   fseek(b, 0, SEEK_SET);
   //TUDO CABEÇALHO
@@ -901,6 +908,9 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     bp->freq[0]++;
     insere_naoCheio_B(b, &bp->node[0], cab.noRaiz, reg, RRN_reg, bp);   
   } 
+
+    fp = fopen("buffer-info.text", "a");
+    fprintf(fp, "Page fault: %d; Page hit: %d.\n", fault, hit);
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
@@ -1129,6 +1139,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         if(bufPool->RRN[i] == RRN){         //RRN está no buffer
+            hit++;                          //Atualiza hit
             aux->n = bufPool->node[i].n;    
             for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
                 //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
@@ -1146,6 +1157,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
     //Página não está no buffer
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
+        fault++;            //Atualiza fault
         //Checar cabeçalho
         //Pulando o cabeçalho
         fseek(b, TAM_CAB_INDICE, SEEK_SET);
@@ -1191,6 +1203,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     //Página está no buffer
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
+        hit++;          //Atualiza hit;
         if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
         if(bufPool->RRN[i] == RRN){
             for(j = 0;j < 9;j++){
@@ -1208,8 +1221,9 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     //Página não está no buffer
     //Verifica se percorreu todo o buffer
     if(i == TAM_BUFFER){
+        fault++;            //Atualiza fault
         if(isVazio != -1){
-            printf("isVazio = %d\n", isVazio);
+            //printf("isVazio = %d\n", isVazio);
             //Copia a pagina pro buffer
             bufPool->node[isVazio].n = page->n;
             for(j = 0;j < 9;j++){
