@@ -8,7 +8,7 @@ registro.o: registro.c registro.h
 	gcc -c registro.c -o registro.o
 
 run:main
-	./main 10 'turmaB-dadosPBLE.csv'
+	./main 12 31031917
 
 clean:
 	rm -rf *o main

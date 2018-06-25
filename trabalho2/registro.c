@@ -527,7 +527,7 @@ int inserir_registro(int cod, char data[10], char uf[2], char* nome_esc, char* m
     fseek(f, 0, SEEK_SET);
     fwrite(&status, sizeof(char), 1, f);
     fclose(f);
- 
+
   return rrn_topo_pilha;
 }
 
@@ -739,7 +739,7 @@ FILE* criar_indice(Registro *reg, int qtdRegs, bPool *bp){
 
 //Funcao para carregar o arquivo de arvore B
 void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp){
-    FILE *b;        //Arquivo da árvore B 
+    FILE *b;        //Arquivo da árvore B
     FILE *fp;       //Arquivo de buffer-info
     arvoreB *root = NULL;
     int tamAtual = 0;       //Numero de nós na árvore
@@ -775,10 +775,10 @@ void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp){
         root->pr[i] = -1;
     }
     root->pr[i] = -1;
- 
+
     //insere todos os registros do arquivo de dados no arquivo de indices
     for(int i = 0; i < 10; i++){
-        inserir_B(b, reg[i], i, bp); 
+        inserir_B(b, reg[i], i, bp);
         if(i == 10){
           printf("\ni = %d\n\n", i);
           fseek(b, 9, SEEK_SET);
@@ -797,7 +797,7 @@ void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp){
     fclose(b);
 }
 
-void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){  
+void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   int i, noRaiz, altura, ultimoRRN;
   char status;
 
@@ -828,7 +828,7 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
     //atualiza o no raiz
     noRaiz = 0;
     fwrite(&noRaiz, sizeof(int), 1, b);
-    //pula a altura                       
+    //pula a altura
     fread(&altura, sizeof(int), 1, b);
     //atualiza ultimoRRN
     ultimoRRN = 0;
@@ -892,12 +892,12 @@ void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp){
   }
   else{
     bp->freq[0]++;
-    insere_naoCheio_B(b, &bp->node[0], noRaiz, reg, RRN_reg, bp);   
-  } 
+    insere_naoCheio_B(b, &bp->node[0], noRaiz, reg, RRN_reg, bp);
+  }
 }
 
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp){
-  
+
   int pos, posBuffer;
   pos = x->n - 1;
 
@@ -1048,9 +1048,9 @@ int get(FILE *b, int RRN, bPool *bufPool){
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         if(bufPool->RRN[i] == RRN){         //RRN está no buffer
             hit++;                          //Atualiza hit
-            aux->n = bufPool->node[i].n;    
+            aux->n = bufPool->node[i].n;
             for(j = 0;j < bufPool->node[i].n;j++){        //Roda por todos os registros do nó
-                //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+                //Copia todo o conteudo do nó que está no buffer para uma auxiliar
                 aux->p[j] = bufPool->node[i].p[j];
                 aux->c[j] = bufPool->node[i].c[j];
                 aux->pr[j] = bufPool->node[i].pr[j];
@@ -1072,7 +1072,7 @@ int get(FILE *b, int RRN, bPool *bufPool){
         //Indo pro RRN desejado
         fseek(b, RRN*TAM_NO_INDICE, SEEK_CUR);
 
-        //Copia todo o conteudo do nó que está no buffer para uma auxiliar 
+        //Copia todo o conteudo do nó que está no buffer para uma auxiliar
         fread(&aux->n, 1, sizeof(int), b);
         for(j = 0;j < bufPool->node[i].n;j++){          //Roda por todos os registros do nó
             fread(&aux->p[i], 1, sizeof(int), b);
@@ -1094,7 +1094,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     int i, j;
     int isVazio = -1;    //0 = cheio, >0 espaço vazio, n = primeiro espaço vazio
     //Variáveis pra localizar o menos utilizado (LFU)
-    int menor = INT_MAX;      
+    int menor = INT_MAX;
     int pos = -1;
     int aux;
 
@@ -1102,7 +1102,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
     for(i = 0;i < TAM_BUFFER;i++){          //Procura no buffer pelo RRN do nó
         //se freq == 0 significa que não tem uma página alocada, portanto o buffer não está cheio
         hit++;          //Atualiza hit;
-        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;    
+        if(bufPool->freq[i] == 0 && isVazio == -1)    isVazio = i;
         if(bufPool->RRN[i] == RRN){
             for(j = 0;j < 9;j++){
                 bufPool->node[i].p[j] = page->p[j];
@@ -1155,7 +1155,7 @@ int put(FILE *b, int RRN, arvoreB *page, bPool *bufPool){
             bufPool->node[pos].p[j] = page->p[j];             //Copia o último ponteiro (n+1)
             bufPool->freq[pos] = 1;                           //Primeiro acesso
             bufPool->RRN[pos] = RRN;                         //Atualiza o RRN no buffer
-        } 
+        }
     }
 
     return pos;
@@ -1200,7 +1200,7 @@ void swapRaiz(int RRN_novaRaiz, bPool* bp){
   int i,j;
   int auxN=0,auxRRN=0, auxFreq=0;
   int auxC[9],auxP[9], auxPR[9];
- 
+
   //encontrando o indice
   for(i = 1; i < TAM_BUFFER; i++){
     if(bp->RRN[i] == RRN_novaRaiz) break;
@@ -1215,13 +1215,13 @@ void swapRaiz(int RRN_novaRaiz, bPool* bp){
   auxFreq = bp->freq[0];
   bp->freq[0] = bp->freq[i];
   bp->freq[i] = auxFreq;
- 
+
   //trocando os n
   auxN = bp->node[0].n;
   bp->node[0].n = bp->node[i].n;
   bp->node[i].n = auxN;
- 
-   
+
+
     //trocando os c's,p's, e pr's
     for(j=0;j< auxN;j++){
       auxC[j]= bp->node[0].c[j];
@@ -1229,14 +1229,14 @@ void swapRaiz(int RRN_novaRaiz, bPool* bp){
       auxPR[j]= bp->node[0].pr[j];
     }
     auxP[j]= bp->node[0].p[j];
-    
+
     for(j=0;j< bp->node[0].n;j++){
       bp->node[0].c[j] = bp->node[i].c[j];
       bp->node[0].p[j] = bp->node[i].p[j];
       bp->node[0].pr[j] = bp->node[i].pr[j];
     }
     bp->node[0].p[j] = bp->node[i].p[j];
-    
+
     for(j=0;j< bp->node[i].n;j++){
       bp->node[i].c[j] = auxC[j];
       bp->node[i].p[j] = auxP[j];
@@ -1278,6 +1278,7 @@ int busca_B(int rrn, int key, bPool *bp, FILE *b){
     int pos_buffer;
     int qtd;
 
+    printf("entrou\n" );
     //Pega o buffer e a posição do rrn desejado no buffer
     pos_buffer = get(b, rrn, bp);
 
@@ -1285,14 +1286,14 @@ int busca_B(int rrn, int key, bPool *bp, FILE *b){
     qtd = bp->node[pos_buffer].n;
 
     //Se o nó se encontra vazio retorna -1
-    if(qtd = 0) return -1;
-    
+    if(qtd == 0) return -1;
+
     for(i = 0;i < qtd; i++){
         //ACHOU
-        if(bp->node[pos_buffer].c[i] == key)    return bp->node[pos_buffer].pr[i];      
+        if(bp->node[pos_buffer].c[i] == key)    return bp->node[pos_buffer].pr[i];
         //Se a chave no buffer for maior, tem que pegar o ponteiro correspondente
-        if(bp->node[pos_buffer].c[i] > key)     return busca_B(bp->node[pos_buffer].p[i], key, bp, b);      
-    }    
-    //Percorreu a 
+        if(bp->node[pos_buffer].c[i] > key)     return busca_B(bp->node[pos_buffer].p[i], key, bp, b);
+    }
+    //Percorreu a
     return busca_B(bp->node[pos_buffer].p[i], key, bp, b);
 }
