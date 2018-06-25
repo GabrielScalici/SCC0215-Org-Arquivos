@@ -1262,3 +1262,24 @@ void printa_bPool(bPool* bp){
     printf("\n");
   }
 }
+
+int get_raiz(FILE *b){
+    char status;
+    int raiz;
+
+    fread(&status, 1, sizeof(char), b);
+    fread(&raiz, 1, sizeof(int), b);
+
+    return raiz;
+}
+
+int busca_B(int rrn, int key, bPool *bp, FILE *b){
+    int i;
+    int node;
+
+    node = get(b, rrn, bp);
+
+    for(i = 0;i < 9; i++){
+        
+    }    
+}

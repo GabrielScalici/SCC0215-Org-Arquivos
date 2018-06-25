@@ -176,12 +176,15 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		case(BUSCA_INDICE):{
+			int rrn_raiz, rrn_desejado = -1;
 			bPool *bp;
 			FILE *b;
+			int i;
+			int key;
 
 			//Inicializando buffer-pool
 			bp = (bPool *) calloc(1, sizeof(bPool));
-			for(int i = 0;i < TAM_BUFFER;i++){
+			for(i = 0;i < TAM_BUFFER;i++){
 				bp->RRN[i] = -1;
 				bp->freq[i] = 0;
 			}
@@ -190,6 +193,13 @@ int main(int argc, char *argv[]){
 			b = fopen("arvoreB.bin", "r+b");
 			if(b == NULL)	return -1;
 
+			//Pega o nó raiz pelo arquivo de indice
+			rrn_raiz = get_raiz(b);
+
+			key = atoi(argv[2]);
+			rrn_desejado = busca_B(rrn_raiz, key, bp, b);	//raiz ta no zero
+
+			fclose(b);
 			break;
 		}
 	}

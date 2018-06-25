@@ -104,7 +104,8 @@ void criar_arvore_B(Registro *reg, int qtdRegs, bPool *bp);
 void inserir_B(FILE *b, Registro reg, int RRN_reg, bPool *bp);
 void insere_naoCheio_B(FILE *b, arvoreB* x, int RRN_indiceX, Registro reg, int RRN_reg, bPool *bp);
 void split_B(FILE *b, bPool *bp, arvoreB* pai, int RRN_pai, int pont, arvoreB* filhoCheio, int RRN_filhoCheio);
-void busca_B(Registro *reg, int chave, int rrn);
+int get_raiz(FILE *b);
+int busca_B(int rrn, int key, bPool *bp, FILE *b);
 
 //Buffer pool
 int get(FILE *b, int RRN, bPool *bufPool);                  //Recupera o conteúdo de um nó
