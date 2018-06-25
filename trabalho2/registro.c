@@ -1283,12 +1283,10 @@ int busca_B(int rrn, int key, bPool *bp, FILE *b){
 
     //Pega a quantidade de indices
     qtd = bp->node[pos_buffer].n;
-    
+
     //Se o nó se encontra vazio retorna -1
     if(qtd = 0) return -1;
-
-
-
+    
     for(i = 0;i < qtd; i++){
         //ACHOU
         if(bp->node[pos_buffer].c[i] == key)    return bp->node[pos_buffer].pr[i];      

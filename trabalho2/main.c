@@ -198,8 +198,10 @@ int main(int argc, char *argv[]){
 
 			key = atoi(argv[2]);
 			rrn_desejado = busca_B(rrn_raiz, key, bp, b);	//raiz ta no zero
-
 			fclose(b);
+
+			busca_rrn(rrn_desejado);
+
 			break;
 		}
 	}
