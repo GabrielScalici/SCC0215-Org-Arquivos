@@ -1275,11 +1275,26 @@ int get_raiz(FILE *b){
 
 int busca_B(int rrn, int key, bPool *bp, FILE *b){
     int i;
-    int node;
+    int pos_buffer;
+    int qtd;
 
-    node = get(b, rrn, bp);
+    //Pega o buffer e a posição do rrn desejado no buffer
+    pos_buffer = get(b, rrn, bp);
 
-    for(i = 0;i < 9; i++){
-        
+    //Pega a quantidade de indices
+    qtd = bp->node[pos_buffer].n;
+    
+    //Se o nó se encontra vazio retorna -1
+    if(qtd = 0) return -1;
+
+
+
+    for(i = 0;i < qtd; i++){
+        //ACHOU
+        if(bp->node[pos_buffer].c[i] == key)    return bp->node[pos_buffer].pr[i];      
+        //Se a chave no buffer for maior, tem que pegar o ponteiro correspondente
+        if(bp->node[pos_buffer].c[i] > key)     return busca_B(bp->node[pos_buffer].p[i], key, bp, b);      
     }    
+    //Percorreu a 
+    return busca_B(bp->node[pos_buffer].p[i], key, bp, b);
 }
