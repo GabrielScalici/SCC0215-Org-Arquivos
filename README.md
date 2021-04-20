@@ -12,13 +12,13 @@
 * Inserção de registros
 * Remoção de registros
 * Atualização de registros
-* Abordagem dinâmica de reaproveitamento de espaço
+* Abordagem dinâmica de reaproveitamento de espaço em disco
 * Remoção lógica e física
 * Desfragmentação
 
 # :fire: Trabalho 2
 * Armazenamento de registros em arquivos
-* Recuperaçã
+* Recuperação de registros em arquivos
 * Armazenamento de registros em arquivoso otimizda de arquivos
 * Árvore-B
 * Buffer-pool
